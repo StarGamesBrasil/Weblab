@@ -1,0 +1,1504 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arnopotch WebLab - Buscador & Criador de Web</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        google: {
+                            blue: '#1a73e8',
+                            hoverBlue: '#1557b0',
+                            red: '#ea4335',
+                            yellow: '#fbbc04',
+                            green: '#34a853',
+                            grayBg: '#f8f9fa',
+                            darkBg: '#202124',
+                            darkCard: '#2d2e31',
+                            darkBorder: '#3c4043'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Google Sans', 'Roboto', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+        .editor-textarea { tab-size: 2; resize: none; white-space: pre; word-break: normal; }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-google-darkBg text-gray-800 dark:text-gray-100 font-sans h-full flex flex-col transition-colors duration-200 selection:bg-google-blue selection:text-white">
+
+    <!-- AUTHENTICATION SCREEN (LOGIN / REGISTER) -->
+    <div id="authScreen" class="fixed inset-0 z-50 bg-gray-900 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-google-darkCard w-full max-w-md rounded-2xl shadow-2xl border border-gray-200 dark:border-google-darkBorder overflow-hidden">
+            <div class="p-6 text-center border-b border-gray-100 dark:border-google-darkBorder">
+                <div class="flex justify-center text-4xl font-bold tracking-tight mb-2">
+                    <span class="text-blue-500">w</span>
+                    <span class="text-red-500">e</span>
+                    <span class="text-yellow-500">b</span>
+                    <span class="text-blue-500">l</span>
+                    <span class="text-green-500">a</span>
+                    <span class="text-red-500">b</span>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400">Entre para publicar e gerenciar seus sites</p>
+            </div>
+
+            <!-- TABS -->
+            <div class="flex border-b border-gray-200 dark:border-google-darkBorder bg-gray-50 dark:bg-google-darkBg">
+                <button id="authTabLoginBtn" onclick="switchAuthTab('login')" class="flex-1 py-3 text-sm font-semibold text-google-blue border-b-2 border-google-blue">Entrar</button>
+                <button id="authTabRegisterBtn" onclick="switchAuthTab('register')" class="flex-1 py-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white">Cadastrar</button>
+            </div>
+
+            <!-- LOGIN FORM -->
+            <form id="loginForm" onsubmit="handleLogin(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nome de Usuário</label>
+                    <input type="text" id="loginUsername" required placeholder="ex: usuario123" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Senha</label>
+                    <input type="password" id="loginPassword" required placeholder="••••••••" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+                <button type="submit" id="btnLoginSubmit" class="w-full py-2.5 bg-google-blue hover:bg-google-hoverBlue text-white text-sm font-semibold rounded-lg shadow transition-all flex justify-center items-center gap-2">
+                    <span>Entrar na Conta</span>
+                </button>
+            </form>
+
+            <!-- REGISTER FORM -->
+            <form id="registerForm" onsubmit="handleRegister(event)" class="p-6 space-y-4 hidden">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nome de Exibição (Nome nos sites)</label>
+                    <input type="text" id="regDisplayName" required placeholder="ex: João Silva" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Nome de Usuário (login - sem espaços/especiais)</label>
+                    <input type="text" id="regUsername" required oninput="cleanUsernameInput(this)" placeholder="ex: joaosilva" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Senha</label>
+                    <input type="password" id="regPassword" required placeholder="••••••••" class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+                <button type="submit" id="btnRegisterSubmit" class="w-full py-2.5 bg-google-green hover:bg-emerald-600 text-white text-sm font-semibold rounded-lg shadow transition-all flex justify-center items-center gap-2">
+                    <span>Criar Conta</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MAIN NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-white dark:bg-google-darkCard border-b border-gray-200 dark:border-google-darkBorder px-4 py-2.5 flex items-center justify-between shadow-sm">
+        <div class="flex items-center space-x-6">
+            <div class="flex items-center space-x-2 cursor-pointer" onclick="switchTab('search')">
+                <div class="flex text-2xl font-bold tracking-tight">
+                    <span class="text-blue-500">w</span>
+                    <span class="text-red-500">e</span>
+                    <span class="text-yellow-500">b</span>
+                    <span class="text-blue-500">l</span>
+                    <span class="text-green-500">a</span>
+                    <span class="text-red-500">b</span>
+                </div>
+                <span class="bg-blue-100 dark:bg-blue-900/40 text-google-blue dark:text-blue-300 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
+                    Arnopotch WebLab 5.25
+                </span>
+            </div>
+
+            <nav class="hidden md:flex items-center space-x-1 bg-gray-100 dark:bg-google-darkBg p-1 rounded-full border border-gray-200 dark:border-google-darkBorder">
+                <button onclick="switchTab('search')" id="nav-btn-search" class="px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center space-x-2 bg-white dark:bg-google-darkCard text-google-blue shadow-sm">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Buscador</span>
+                </button>
+                <button onclick="switchTab('editor')" id="nav-btn-editor" class="px-4 py-1.5 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-code"></i>
+                    <span>Criador (IDE)</span>
+                </button>
+                <button onclick="switchTab('browser')" id="nav-btn-browser" class="px-4 py-1.5 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-all flex items-center space-x-2">
+                    <i class="fa-solid fa-globe"></i>
+                    <span>Navegador</span>
+                </button>
+            </nav>
+        </div>
+
+        <div class="hidden lg:flex items-center flex-1 max-w-md mx-8">
+            <div class="relative w-full">
+                <input type="text" id="headerSearchInput" onkeyup="handleHeaderSearch(event)" placeholder="Pesquisar sites, jogos, blogs..." class="w-full bg-gray-100 dark:bg-google-darkBg text-gray-800 dark:text-white text-sm rounded-full pl-10 pr-4 py-2 border border-transparent focus:border-google-blue focus:bg-white dark:focus:bg-google-darkCard outline-none transition-all">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="flex items-center space-x-3">
+            <button onclick="createNewSite()" class="hidden sm:flex items-center space-x-2 bg-google-blue hover:bg-google-hoverBlue text-white text-sm font-medium px-4 py-2 rounded-full transition-all shadow-sm active:scale-95">
+                <i class="fa-solid fa-plus"></i>
+                <span>Novo Site</span>
+            </button>
+
+            <button onclick="toggleDarkMode()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-google-darkBorder rounded-full transition-colors" title="Alternar Tema">
+                <i class="fa-solid fa-moon dark:hidden text-lg"></i>
+                <i class="fa-solid fa-sun hidden dark:block text-yellow-400 text-lg"></i>
+            </button>
+
+            <!-- USER INFO / LOGOUT -->
+            <div class="flex items-center space-x-2 border-l border-gray-200 dark:border-google-darkBorder pl-3">
+                <div id="userAvatar" class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-green-500 flex items-center justify-center text-white font-bold text-xs shadow-sm uppercase">
+                    U
+                </div>
+                <div class="hidden sm:flex flex-col text-left">
+                    <span id="userDisplayName" class="text-xs font-bold text-gray-800 dark:text-white truncate max-w-[100px]">Usuário</span>
+                    <span id="userHandle" class="text-[10px] text-gray-400 truncate max-w-[100px]">@username</span>
+                </div>
+                <button onclick="handleLogout()" class="p-2 text-gray-500 hover:text-red-500 dark:text-gray-400 rounded-full transition-colors" title="Sair da conta">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MOBILE NAVIGATION -->
+    <div class="md:hidden flex justify-around bg-white dark:bg-google-darkCard border-t border-gray-200 dark:border-google-darkBorder py-2 px-4 sticky bottom-0 z-40 order-last">
+        <button onclick="switchTab('search')" id="mobile-nav-search" class="flex flex-col items-center text-xs text-google-blue font-medium">
+            <i class="fa-solid fa-magnifying-glass text-base mb-1"></i>
+            Search
+        </button>
+        <button onclick="switchTab('editor')" id="mobile-nav-editor" class="flex flex-col items-center text-xs text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-code text-base mb-1"></i>
+            Criar
+        </button>
+        <button onclick="switchTab('browser')" id="mobile-nav-browser" class="flex flex-col items-center text-xs text-gray-500 dark:text-gray-400">
+            <i class="fa-solid fa-globe text-base mb-1"></i>
+            Navegar
+        </button>
+    </div>
+
+    <!-- MAIN CONTAINER -->
+    <main class="flex-1 relative overflow-hidden flex flex-col">
+
+        <!-- VIEW 1: SEARCH ENGINE -->
+        <section id="view-search" class="flex-1 overflow-y-auto p-4 md:p-8 flex flex-col items-center">
+            <div class="w-full max-w-3xl flex flex-col items-center my-6 md:my-10 text-center">
+                <div class="flex text-5xl md:text-7xl font-bold tracking-tight mb-6">
+                    <span class="text-blue-500">W</span>
+                    <span class="text-red-500">e</span>
+                    <span class="text-yellow-500">b</span>
+                    <span class="text-blue-500">L</span>
+                    <span class="text-green-500">a</span>
+                    <span class="text-red-500">b</span>
+                    <span class="text-gray-400 text-2xl font-light ml-2">Arnopotch &copy;</span>
+                </div>
+
+                <div class="w-full relative group">
+                    <div class="flex items-center w-full bg-white dark:bg-google-darkCard hover:shadow-lg focus-within:shadow-lg rounded-full border border-gray-200 dark:border-google-darkBorder px-5 py-3.5 transition-all">
+                        <i class="fa-solid fa-magnifying-glass text-gray-400 text-lg mr-4"></i>
+                        <input type="text" id="mainSearchInput" oninput="renderSearchResults()" placeholder="Pesquise por sites criados, jogos, portfólios ou autores..." class="w-full bg-transparent text-gray-800 dark:text-white outline-none text-base md:text-lg">
+                        <button onclick="clearSearch()" id="clearSearchBtn" class="hidden text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 p-1">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap justify-center gap-2 mt-6" id="categoryFilters"></div>
+            </div>
+
+            <div class="w-full max-w-6xl mt-4">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-200 dark:border-google-darkBorder pb-3">
+                    <h2 id="resultsHeading" class="text-lg font-medium text-gray-700 dark:text-gray-300 flex items-center gap-2">
+                        <i class="fa-solid fa-fire text-google-red"></i>
+                        <span>Sites em Destaque na Web</span>
+                    </h2>
+                    <span id="resultsCount" class="text-xs text-gray-500 dark:text-gray-400">Carregando dados...</span>
+                </div>
+
+                <div id="sitesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+                <div id="noResultsState" class="hidden flex-col items-center justify-center py-16 text-center">
+                    <i class="fa-regular fa-compass text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
+                    <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300">Nenhum site encontrado</h3>
+                    <p class="text-sm text-gray-500 max-w-md mt-1">Tente pesquisar com outros termos ou seja o primeiro a publicar um projeto nessa categoria!</p>
+                    <button onclick="createNewSite()" class="mt-4 bg-google-blue text-white px-5 py-2 rounded-full text-sm font-medium hover:bg-google-hoverBlue transition-colors">
+                        Criar Novo Site
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 2: IDE / EDITOR -->
+        <section id="view-editor" class="hidden flex-1 flex-col h-full overflow-hidden bg-gray-900 text-white">
+            <div class="bg-gray-800 border-b border-gray-700 px-4 py-2 flex flex-wrap items-center justify-between gap-3 text-xs md:text-sm">
+                <div class="flex items-center space-x-3">
+                    <i class="fa-solid fa-pen-to-square text-google-blue text-base"></i>
+                    <input type="text" id="editorSiteTitle" value="Meu Novo Site" class="bg-gray-700 hover:bg-gray-650 focus:bg-gray-900 text-white font-medium px-2.5 py-1 rounded outline-none border border-transparent focus:border-google-blue transition-all w-36 sm:w-48">
+                    
+                    <div class="h-4 w-px bg-gray-700"></div>
+
+                    <select id="templateSelector" onchange="loadTemplate(this.value)" class="bg-gray-700 text-gray-200 border border-gray-600 rounded px-2 py-1 outline-none cursor-pointer hover:bg-gray-650">
+                        <option value="" disabled selected>⚡ Carregar Modelo</option>
+                        <option value="blank">Página em Branco</option>
+                        <option value="portfolio">Portfólio Neon (Dark)</option>
+                        <option value="game">Jogo Canvas Interativo</option>
+                        <option value="calculator">Calculadora Estilizada</option>
+                    </select>
+                </div>
+
+                <div class="hidden lg:flex items-center bg-gray-900 rounded-lg p-1 border border-gray-700 space-x-1">
+                    <button onclick="setViewport('100%')" id="vp-desktop" class="px-2.5 py-1 rounded text-xs bg-gray-700 text-white font-medium hover:text-white transition-colors">
+                        <i class="fa-solid fa-desktop mr-1"></i> Desktop
+                    </button>
+                    <button onclick="setViewport('768px')" id="vp-tablet" class="px-2.5 py-1 rounded text-xs text-gray-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-tablet-screen-button mr-1"></i> Tablet
+                    </button>
+                    <button onclick="setViewport('375px')" id="vp-mobile" class="px-2.5 py-1 rounded text-xs text-gray-400 hover:text-white transition-colors">
+                        <i class="fa-solid fa-mobile-screen mr-1"></i> Mobile
+                    </button>
+                </div>
+
+                <div class="flex items-center space-x-2">
+                    <button onclick="formatCode()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded flex items-center space-x-1.5 transition-colors">
+                        <i class="fa-solid fa-wand-magic-sparkles text-yellow-400"></i>
+                        <span class="hidden sm:inline">Formatar</span>
+                    </button>
+                    <button onclick="openPublishModal()" class="bg-google-green hover:bg-emerald-600 text-white font-semibold px-4 py-1.5 rounded shadow flex items-center space-x-1.5 transition-all">
+                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                        <span>Publicar</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex-1 flex flex-col md:flex-row overflow-hidden relative">
+                <div class="w-full md:w-1/2 flex flex-col h-1/2 md:h-full border-r border-gray-800 bg-gray-950">
+                    <div class="flex bg-gray-900 border-b border-gray-800 text-xs font-mono select-none">
+                        <button onclick="switchCodeTab('html')" id="tab-btn-html" class="px-4 py-2.5 bg-gray-950 text-orange-400 border-t-2 border-orange-500 font-medium flex items-center space-x-2 outline-none">
+                            <i class="fa-brands fa-html5 text-base"></i>
+                            <span>index.html</span>
+                        </button>
+                        <button onclick="switchCodeTab('css')" id="tab-btn-css" class="px-4 py-2.5 text-gray-400 hover:text-gray-200 border-t-2 border-transparent font-medium flex items-center space-x-2 outline-none">
+                            <i class="fa-brands fa-css3-alt text-base text-blue-400"></i>
+                            <span>style.css</span>
+                        </button>
+                        <button onclick="switchCodeTab('js')" id="tab-btn-js" class="px-4 py-2.5 text-gray-400 hover:text-gray-200 border-t-2 border-transparent font-medium flex items-center space-x-2 outline-none">
+                            <i class="fa-brands fa-js text-base text-yellow-400"></i>
+                            <span>script.js</span>
+                        </button>
+                        <div class="flex-1 flex justify-end items-center px-3 text-gray-500 text-[11px]">
+                            <span>Atalho: Ctrl+Enter (Atualizar)</span>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 relative font-mono text-xs md:text-sm">
+                        <textarea id="codeHTML" oninput="schedulePreviewUpdate()" spellcheck="false" class="editor-textarea absolute inset-0 w-full h-full p-4 bg-gray-950 text-gray-100 outline-none leading-relaxed" placeholder="<!-- Escreva seu código HTML aqui -->"></textarea>
+                        <textarea id="codeCSS" oninput="schedulePreviewUpdate()" spellcheck="false" class="editor-textarea hidden absolute inset-0 w-full h-full p-4 bg-gray-950 text-gray-100 outline-none leading-relaxed" placeholder="/* Escreva seus estilos CSS aqui */"></textarea>
+                        <textarea id="codeJS" oninput="schedulePreviewUpdate()" spellcheck="false" class="editor-textarea hidden absolute inset-0 w-full h-full p-4 bg-gray-950 text-gray-100 outline-none leading-relaxed" placeholder="// Escreva seu código JavaScript aqui"></textarea>
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 flex flex-col h-1/2 md:h-full bg-gray-800 items-center justify-center p-2 md:p-4 overflow-hidden">
+                    <div class="w-full h-full bg-white rounded-lg shadow-2xl flex flex-col overflow-hidden transition-all duration-300" id="previewContainer">
+                        <div class="bg-gray-200 dark:bg-gray-700 px-3 py-1.5 flex items-center justify-between text-xs text-gray-600 dark:text-gray-300 border-b border-gray-300 dark:border-gray-600 select-none">
+                            <div class="flex items-center space-x-1.5">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
+                                <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+                                <span class="ml-2 font-mono text-[11px] text-gray-500 dark:text-gray-400">Pré-visualização em tempo real</span>
+                            </div>
+                            <button onclick="updatePreviewNow()" class="hover:text-google-blue flex items-center gap-1 font-medium">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                                <span>Atualizar</span>
+                            </button>
+                        </div>
+                        
+                        <!-- IFRAME COM PERMISSÕES DE SANDBOX ATUALIZADAS -->
+                        <iframe id="livePreviewFrame" 
+                                sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms" 
+                                class="w-full flex-1 bg-white border-0">
+                        </iframe>
+
+                        <div class="border-t border-gray-700 bg-gray-900 text-gray-200 text-xs font-mono flex flex-col h-32">
+                            <div class="bg-gray-800 px-3 py-1 flex justify-between items-center border-b border-gray-700 select-none">
+                                <span class="font-bold flex items-center gap-1.5 text-gray-300">
+                                    <i class="fa-solid fa-terminal text-google-blue"></i> Console Log
+                                </span>
+                                <button onclick="clearConsoleLog('editorConsoleLogs')" class="hover:text-red-400 text-[10px] px-2 py-0.5 rounded bg-gray-700">
+                                    Limpar
+                                </button>
+                            </div>
+                            <div id="editorConsoleLogs" class="flex-1 p-2 overflow-y-auto space-y-1 font-mono text-[11px]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW 3: BROWSER VIEW COM SISTEMA DE MÚLTIPLAS ABAS -->
+        <section id="view-browser" class="hidden flex-1 flex-col h-full bg-gray-100 dark:bg-google-darkBg p-2 md:p-4">
+            <div class="w-full h-full max-w-7xl mx-auto bg-white dark:bg-google-darkCard rounded-xl shadow-2xl border border-gray-200 dark:border-google-darkBorder flex flex-col overflow-hidden">
+                
+                <!-- BARRA DE ABAS DINÂMICA -->
+                <div class="bg-gray-200 dark:bg-gray-800 px-3 pt-2 flex items-center space-x-1.5 border-b border-gray-300 dark:border-gray-700 overflow-x-auto" id="browserTabsHeader">
+                    <!-- As abas serão renderizadas dinamicamente via JS -->
+                </div>
+
+                <div class="bg-white dark:bg-google-darkCard p-2 flex items-center space-x-2 border-b border-gray-200 dark:border-google-darkBorder">
+                    <button onclick="reloadBrowserFrame()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-google-darkBorder rounded-full transition-colors" title="Recarregar">
+                        <i class="fa-solid fa-rotate-right"></i>
+                    </button>
+
+                    <form onsubmit="handleAddressBarSubmit(event)" class="flex-1 flex items-center bg-gray-100 dark:bg-google-darkBg rounded-full px-4 py-1.5 border border-transparent focus-within:border-google-blue focus-within:bg-white dark:focus-within:bg-google-darkCard transition-all">
+                        <i id="addressLockIcon" class="fa-solid fa-lock text-green-600 text-xs mr-2.5" title="Conexão Segura"></i>
+                        <input type="text" id="browserAddressBar" placeholder="Digite uma URL (ex: https://exemplo.com ou nome do site)..." class="w-full bg-transparent text-xs md:text-sm font-mono text-gray-700 dark:text-gray-300 outline-none">
+                        <button type="submit" class="text-gray-400 hover:text-google-blue px-1.5" title="Ir para o URL">
+                            <i class="fa-solid fa-arrow-right text-xs"></i>
+                        </button>
+                    </form>
+
+                    <button id="btnToggleBrowserConsole" onclick="toggleBrowserConsole()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-google-darkBorder rounded-full transition-colors" title="Alternar Console Browser">
+                        <i class="fa-solid fa-terminal text-sm"></i>
+                    </button>
+
+                    <button id="btnOpenExternalTab" onclick="openCurrentInNewTab()" class="p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-google-darkBorder rounded-full transition-colors" title="Abrir em uma Nova Aba Externa">
+                        <i class="fa-solid fa-arrow-up-right-from-square text-sm"></i>
+                    </button>
+
+                    <button id="btnInspectCurrentSite" onclick="inspectCurrentSite()" class="px-3 py-1.5 bg-gray-100 dark:bg-google-darkBorder hover:bg-gray-200 text-gray-700 dark:text-gray-200 text-xs font-medium rounded-lg flex items-center space-x-1.5 transition-colors">
+                        <i class="fa-solid fa-code text-google-blue"></i>
+                        <span class="hidden sm:inline">Ver Código</span>
+                    </button>
+                </div>
+
+                <div class="flex-1 flex flex-col bg-white relative overflow-hidden">
+                    <iframe id="browserViewportFrame" 
+                            sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-forms" 
+                            class="w-full flex-1 border-0">
+                    </iframe>
+                    
+                    <div id="browserConsolePanel" class="hidden border-t border-gray-700 bg-gray-900 text-gray-200 text-xs font-mono flex-col h-36">
+                        <div class="bg-gray-800 px-3 py-1 flex justify-between items-center border-b border-gray-700 select-none">
+                            <span class="font-bold flex items-center gap-1.5 text-gray-300">
+                                <i class="fa-solid fa-terminal text-google-green"></i> Console do Navegador
+                            </span>
+                            <button onclick="clearConsoleLog('browserConsoleLogs')" class="hover:text-red-400 text-[10px] px-2 py-0.5 rounded bg-gray-700">
+                                Limpar
+                            </button>
+                        </div>
+                        <div id="browserConsoleLogs" class="flex-1 p-2 overflow-y-auto space-y-1 font-mono text-[11px]"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PUBLISH SITE MODAL (COM OPÇÕES DE LICENÇAS) -->
+    <div id="publishModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-google-darkCard w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-google-darkBorder overflow-hidden animate-in fade-in zoom-in duration-200">
+            <div class="bg-gradient-to-r from-google-blue to-blue-600 p-6 text-white">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <h3 class="text-xl font-bold">Publicar no Arnopotch WebLab</h3>
+                        <p class="text-blue-100 text-xs mt-1">Seu site ficará salvo diretamente no Firebase Firestore!</p>
+                    </div>
+                    <button onclick="closePublishModal()" class="text-white/80 hover:text-white p-1">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+            </div>
+
+            <form onsubmit="confirmPublish(event)" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Título do Site</label>
+                    <input type="text" id="pubTitle" required class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Descrição Curta</label>
+                    <textarea id="pubDesc" rows="2" required placeholder="Explique resumidamente do que se trata seu site..." class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Categoria</label>
+                        <select id="pubCategory" class="w-full px-3 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
+                            <option value="Portfolio">Portfólio</option>
+                            <option value="Jogos">Jogos / Canvas</option>
+                            <option value="Blogs">Blog / Artigo</option>
+                            <option value="Ferramentas">Ferramenta / App</option>
+                            <option value="Outros">Outros</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Autor</label>
+                        <input type="text" id="pubAuthor" readonly class="w-full px-3.5 py-2 text-sm bg-gray-200 dark:bg-gray-700 border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none text-gray-600 dark:text-gray-300 cursor-not-allowed">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">URL amigável (Slug)</label>
+                    <div class="flex items-center text-xs font-mono bg-gray-100 dark:bg-google-darkBg rounded-lg px-3 py-2 text-gray-500 border border-gray-300 dark:border-google-darkBorder">
+                        <span>https://ar-weblab.app/docsite/</span>
+                        <input type="text" id="pubSlug" required class="bg-transparent text-google-blue font-bold outline-none flex-1 ml-1" placeholder="meu-site">
+                    </div>
+                </div>
+
+                <!-- SEÇÃO DE LICENÇAS E PRIVACIDADE -->
+                <div class="pt-3 border-t border-gray-200 dark:border-google-darkBorder">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">Licenças & Permissões</label>
+                    <div class="space-y-2 text-xs">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="pubLockCode" class="rounded border-gray-300 text-google-blue focus:ring-google-blue">
+                            <span class="text-gray-700 dark:text-gray-300">Impedir que outras pessoas <strong>vejam o código</strong> do site</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="pubLockEdit" class="rounded border-gray-300 text-google-blue focus:ring-google-blue">
+                            <span class="text-gray-700 dark:text-gray-300">Impedir que outras pessoas <strong>editem</strong> este site</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="pubLockExternal" class="rounded border-gray-300 text-google-blue focus:ring-google-blue">
+                            <span class="text-gray-700 dark:text-gray-300">Impedir que abram o site em uma <strong>guia externa</strong></span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="checkbox" id="pubLockConsole" class="rounded border-gray-300 text-google-blue focus:ring-google-blue">
+                            <span class="text-gray-700 dark:text-gray-300">Impedir a <strong>visualização do console</strong> do site</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-google-darkBorder">
+                    <button type="button" onclick="closePublishModal()" class="px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-google-darkBorder rounded-lg">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="btnPublishSubmit" class="px-5 py-2 text-sm font-semibold text-white bg-google-green hover:bg-emerald-600 rounded-lg shadow-sm transition-all flex items-center space-x-2">
+                        <i class="fa-solid fa-rocket"></i>
+                        <span>Confirmar Publicação</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- FIREBASE SDK INJECTION & INTEGRATION LOGIC -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+        import { 
+            getFirestore, 
+            collection, 
+            doc, 
+            getDoc,
+            setDoc, 
+            updateDoc, 
+            deleteDoc,
+            increment,
+            arrayUnion,
+            arrayRemove,
+            onSnapshot 
+        } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAAOcFu9jaKq4B-h9rDoKKV_SWBTqm4Cgs",
+            authDomain: "arnopotch.firebaseapp.com",
+            projectId: "arnopotch",
+            storageBucket: "arnopotch.firebasestorage.app",
+            messagingSenderId: "898836334119",
+            appId: "1:898836334119:web:ef03fcef71112b1f517002",
+            measurementId: "G-48FWKYK43L"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+        const db = getFirestore(app);
+
+        window.firestoreSites = [];
+        window.currentUser = null;
+        window.activeTab = 'search'; 
+        window.activeCodeTab = 'html'; 
+        window.selectedCategory = 'Todos';
+        window.currentEditingSiteId = null;
+        window.previewUpdateTimer = null;
+
+        // VERIFICA LOGIN SALVO
+        const savedUser = localStorage.getItem('weblab_user');
+        if (savedUser) {
+            try {
+                window.currentUser = JSON.parse(savedUser);
+                document.getElementById('authScreen').classList.add('hidden');
+                updateUserUI();
+            } catch(e) {
+                localStorage.removeItem('weblab_user');
+            }
+        }
+
+        // AUTENTICAÇÃO
+        window.cleanUsernameInput = function(input) {
+            input.value = input.value.toLowerCase().replace(/[^a-z0-9]/g, '');
+        };
+
+        window.switchAuthTab = function(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const loginBtn = document.getElementById('authTabLoginBtn');
+            const regBtn = document.getElementById('authTabRegisterBtn');
+
+            if (tab === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                loginBtn.className = "flex-1 py-3 text-sm font-semibold text-google-blue border-b-2 border-google-blue";
+                regBtn.className = "flex-1 py-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white";
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                regBtn.className = "flex-1 py-3 text-sm font-semibold text-google-blue border-b-2 border-google-blue";
+                loginBtn.className = "flex-1 py-3 text-sm font-semibold text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white";
+            }
+        };
+
+        window.handleLogin = async function(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+            const btn = document.getElementById('btnLoginSubmit');
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Verificando...`;
+
+            try {
+                const userRef = doc(db, "users", username);
+                const userSnap = await getDoc(userRef);
+
+                if (!userSnap.exists()) {
+                    alert("Usuário não encontrado! Verifique o nome de usuário ou cadastre-se.");
+                    return;
+                }
+
+                const userData = userSnap.data();
+                if (userData.password !== password) {
+                    alert("Senha incorreta!");
+                    return;
+                }
+
+                window.currentUser = {
+                    displayName: userData.displayName,
+                    username: userData.username
+                };
+                localStorage.setItem('weblab_user', JSON.stringify(window.currentUser));
+
+                document.getElementById('authScreen').classList.add('hidden');
+                updateUserUI();
+            } catch(err) {
+                alert("Erro ao efetuar login: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Entrar na Conta</span>`;
+            }
+        };
+
+        window.handleRegister = async function(e) {
+            e.preventDefault();
+            const displayName = document.getElementById('regDisplayName').value.trim();
+            const username = document.getElementById('regUsername').value.trim().toLowerCase();
+            const password = document.getElementById('regPassword').value;
+            const btn = document.getElementById('btnRegisterSubmit');
+
+            if (!username) {
+                alert("Nome de usuário inválido!");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Criando...`;
+
+            try {
+                const userRef = doc(db, "users", username);
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    alert("Este nome de usuário já está em uso! Escolha outro.");
+                    return;
+                }
+
+                const newUser = {
+                    displayName: displayName,
+                    username: username,
+                    password: password,
+                    createdAt: new Date().toISOString(),
+                    mySites: []
+                };
+
+                await setDoc(userRef, newUser);
+
+                window.currentUser = {
+                    displayName: displayName,
+                    username: username
+                };
+                localStorage.setItem('weblab_user', JSON.stringify(window.currentUser));
+
+                document.getElementById('authScreen').classList.add('hidden');
+                updateUserUI();
+            } catch(err) {
+                alert("Erro ao criar conta: " + err.message);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `<span>Criar Conta</span>`;
+            }
+        };
+
+        window.handleLogout = function() {
+            if (confirm("Deseja realmente sair da sua conta?")) {
+                localStorage.removeItem('weblab_user');
+                window.currentUser = null;
+                document.getElementById('authScreen').classList.remove('hidden');
+            }
+        };
+
+        function updateUserUI() {
+            if (!window.currentUser) return;
+            document.getElementById('userDisplayName').innerText = window.currentUser.displayName;
+            document.getElementById('userHandle').innerText = `@${window.currentUser.username}`;
+            document.getElementById('userAvatar').innerText = window.currentUser.displayName.charAt(0);
+            document.getElementById('pubAuthor').value = `${window.currentUser.displayName} (@${window.currentUser.username})`;
+        }
+
+        // GERENCIADOR DE ABAS DO NAVEGADOR
+        window.browserTabs = [
+            {
+                id: 'tab-' + Date.now(),
+                title: 'Nova Aba',
+                url: '',
+                site: null
+            }
+        ];
+        window.activeBrowserTabId = window.browserTabs[0].id;
+
+        const sitesRef = collection(db, "sites");
+        onSnapshot(sitesRef, (snapshot) => {
+            const fetched = [];
+            snapshot.forEach((doc) => {
+                fetched.push({ id: doc.id, ...doc.data() });
+            });
+            window.firestoreSites = fetched;
+            renderSearchResults();
+        }, (error) => {
+            console.error("Erro ao sincronizar com o Firestore: ", error);
+        });
+
+        window.confirmPublish = async function(e) {
+            e.preventDefault();
+            if (!window.currentUser) {
+                alert("Você precisa estar logado para publicar!");
+                return;
+            }
+
+            const btnSubmit = document.getElementById('btnPublishSubmit');
+            btnSubmit.disabled = true;
+            btnSubmit.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Salvando...`;
+
+            try {
+                const docId = window.currentEditingSiteId || ('site-' + Date.now());
+                const title = document.getElementById('pubTitle').value;
+                const description = document.getElementById('pubDesc').value;
+                const category = document.getElementById('pubCategory').value;
+                const slug = document.getElementById('pubSlug').value.trim() || 'meu-site';
+                
+                const allowLockCode = document.getElementById('pubLockCode').checked;
+                const allowLockEdit = document.getElementById('pubLockEdit').checked;
+                const allowLockExternal = document.getElementById('pubLockExternal').checked;
+                const allowLockConsole = document.getElementById('pubLockConsole').checked;
+
+                const siteData = {
+                    title: title,
+                    description: description,
+                    category: category,
+                    author: `${window.currentUser.displayName} (@${window.currentUser.username})`,
+                    ownerUsername: window.currentUser.username,
+                    slug: slug,
+                    views: window.currentEditingSiteId ? (window.firestoreSites.find(s=>s.id===window.currentEditingSiteId)?.views || 1) : 1,
+                    likes: window.currentEditingSiteId ? (window.firestoreSites.find(s=>s.id===window.currentEditingSiteId)?.likes || 0) : 0,
+                    updatedAt: new Date().toISOString().split('T')[0],
+                    html: document.getElementById('codeHTML').value,
+                    css: document.getElementById('codeCSS').value,
+                    js: document.getElementById('codeJS').value,
+                    lockCode: allowLockCode,
+                    lockEdit: allowLockEdit,
+                    lockExternal: allowLockExternal,
+                    lockConsole: allowLockConsole
+                };
+
+                await setDoc(doc(db, "sites", docId), siteData, { merge: true });
+
+                // ATUALIZA O NÓ DO USUÁRIO NO FIREBASE (users/{username}/mySites)
+                const userRef = doc(db, "users", window.currentUser.username);
+                await updateDoc(userRef, {
+                    mySites: arrayUnion({ id: docId, title: title, slug: slug })
+                }).catch(async (e) => {
+                    await setDoc(userRef, { mySites: [{ id: docId, title: title, slug: slug }] }, { merge: true });
+                });
+
+                closePublishModal();
+                openInBrowser(docId);
+            } catch (err) {
+                alert("Erro ao salvar no Firestore: " + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerHTML = `<i class="fa-solid fa-rocket"></i><span>Confirmar Publicação</span>`;
+            }
+        };
+
+        // FUNÇÃO DE EXCLUSÃO
+        window.deleteSite = async function(siteId, title) {
+            if (!window.currentUser) {
+                alert("Você precisa estar logado para excluir um site.");
+                return;
+            }
+
+            const site = (window.firestoreSites || []).find(s => s.id === siteId);
+            if (!site) {
+                alert("Site não encontrado.");
+                return;
+            }
+
+            if (site.ownerUsername !== window.currentUser.username) {
+                alert("Apenas o criador deste site pode excluí-lo!");
+                return;
+            }
+
+            if (!confirm(`Tem certeza de que deseja excluir permanentemente o site "${title}"?`)) return;
+
+            try {
+                await deleteDoc(doc(db, "sites", siteId));
+                
+                const userRef = doc(db, "users", window.currentUser.username);
+                const userSnap = await getDoc(userRef);
+                if (userSnap.exists()) {
+                    const userData = userSnap.data();
+                    const updatedSites = (userData.mySites || []).filter(s => s.id !== siteId);
+                    await updateDoc(userRef, { mySites: updatedSites });
+                }
+
+                alert("Site excluído com sucesso!");
+            } catch(e) {
+                alert("Erro ao excluir site: " + e.message);
+            }
+        };
+
+        window.likeSite = async function(siteId) {
+            try {
+                const siteRef = doc(db, "sites", siteId);
+                await updateDoc(siteRef, {
+                    likes: increment(1)
+                });
+            } catch(e) {
+                console.error("Erro ao dar Curtida: ", e);
+            }
+        };
+
+        window.incrementViews = async function(siteId) {
+            try {
+                const siteRef = doc(db, "sites", siteId);
+                await updateDoc(siteRef, {
+                    views: increment(1)
+                });
+            } catch(e) {
+                console.error("Erro ao incrementar visualizações: ", e);
+            }
+        };
+    </script>
+
+    <!-- UI LOGIC -->
+    <script>
+        window.addEventListener('message', function(event) {
+            if (event.data && event.data.type === 'IFRAME_CONSOLE') {
+                const activeTab = getActiveBrowserTab();
+                const isOwner = window.currentUser && activeTab.site && activeTab.site.ownerUsername === window.currentUser.username;
+                
+                // Se o console for bloqueado no site e o usuário não for o proprietário, ignora mensagens no console do navegador
+                if (activeTab.site && activeTab.site.lockConsole && !isOwner) {
+                    return;
+                }
+
+                const logData = event.data;
+                appendConsoleLog('editorConsoleLogs', logData);
+                appendConsoleLog('browserConsoleLogs', logData);
+            }
+            if (event.data && event.data.type === 'OPEN_WINDOW') {
+                if (event.data.url && event.data.url.trim() !== '') {
+                    window.open(event.data.url, '_blank');
+                }
+            }
+        });
+
+        function appendConsoleLog(containerId, data) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const div = document.createElement('div');
+            let textColor = 'text-gray-300';
+            if (data.level === 'warn') textColor = 'text-yellow-400';
+            if (data.level === 'error') textColor = 'text-red-400';
+
+            div.className = `${textColor} border-b border-gray-800/50 pb-0.5 flex gap-2`;
+            div.innerHTML = `<span class="opacity-50 text-[10px] select-none">[${data.level.toUpperCase()}]</span> <span>${escapeHtml(data.message)}</span>`;
+            
+            container.appendChild(div);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearConsoleLog(containerId) {
+            const container = document.getElementById(containerId);
+            if (container) container.innerHTML = '';
+        }
+
+        function toggleBrowserConsole() {
+            const activeTab = getActiveBrowserTab();
+            const isOwner = window.currentUser && activeTab.site && activeTab.site.ownerUsername === window.currentUser.username;
+            if (activeTab.site && activeTab.site.lockConsole && !isOwner) {
+                alert("O proprietário deste site desativou o console.");
+                return;
+            }
+
+            const panel = document.getElementById('browserConsolePanel');
+            panel.classList.toggle('hidden');
+            panel.classList.toggle('flex');
+        }
+
+        function getSavedSites() {
+            return window.firestoreSites || [];
+        }
+
+        function switchTab(tab) {
+            window.activeTab = tab;
+
+            document.getElementById('view-search').classList.add('hidden');
+            document.getElementById('view-editor').classList.add('hidden');
+            document.getElementById('view-browser').classList.add('hidden');
+
+            ['search', 'editor', 'browser'].forEach(t => {
+                const btn = document.getElementById(`nav-btn-${t}`);
+                if (btn) {
+                    btn.className = "px-4 py-1.5 rounded-full text-sm font-medium transition-all flex items-center space-x-2 " +
+                        (t === tab ? "bg-white dark:bg-google-darkCard text-google-blue shadow-sm" : "text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white");
+                }
+            });
+
+            document.getElementById(`view-${tab}`).classList.remove('hidden');
+            document.getElementById(`view-${tab}`).classList.add('flex');
+
+            if (tab === 'search') {
+                renderSearchResults();
+            } else if (tab === 'editor') {
+                updatePreviewNow();
+            } else if (tab === 'browser') {
+                renderBrowserTabs();
+            }
+        }
+
+        function renderBrowserTabs() {
+            const container = document.getElementById('browserTabsHeader');
+            if (!container) return;
+
+            let html = window.browserTabs.map(tab => {
+                const isActive = tab.id === window.activeBrowserTabId;
+                const activeClass = isActive 
+                    ? "bg-white dark:bg-google-darkCard text-gray-800 dark:text-white shadow-sm" 
+                    : "bg-gray-300/60 dark:bg-gray-700/60 text-gray-600 dark:text-gray-300 hover:bg-gray-300 dark:hover:bg-gray-700";
+
+                return `
+                    <div onclick="selectBrowserTab('${tab.id}')" class="group flex items-center space-x-2 px-3 py-1.5 rounded-t-lg text-xs font-medium max-w-[180px] cursor-pointer transition-all select-none ${activeClass}">
+                        <i class="fa-solid fa-globe text-google-blue shrink-0"></i>
+                        <span class="truncate flex-1">${escapeHtml(tab.title || 'Nova Aba')}</span>
+                        <button onclick="closeBrowserTab(event, '${tab.id}')" class="text-gray-400 hover:text-red-500 rounded-full p-0.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <i class="fa-solid fa-xmark text-xs"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            html += `
+                <button onclick="createNewBrowserTab()" class="p-1.5 text-gray-600 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white hover:bg-gray-300 dark:hover:bg-gray-700 rounded-full transition-colors ml-1" title="Nova Aba">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+            `;
+
+            container.innerHTML = html;
+            updateActiveBrowserTabUI();
+        }
+
+        function createNewBrowserTab(initialUrl = '', initialSite = null) {
+            const newTabId = 'tab-' + Date.now();
+            const newTab = {
+                id: newTabId,
+                title: initialSite ? initialSite.title : (initialUrl ? initialUrl : 'Nova Aba'),
+                url: initialSite ? `https://ar-weblab.app/docsite/${initialSite.slug}` : initialUrl,
+                site: initialSite
+            };
+
+            window.browserTabs.push(newTab);
+            window.activeBrowserTabId = newTabId;
+
+            renderBrowserTabs();
+            switchTab('browser');
+
+            if (initialSite) {
+                if (window.incrementViews) window.incrementViews(initialSite.id);
+            } else if (initialUrl) {
+                loadUrlInCurrentTab(initialUrl);
+            } else {
+                const frame = document.getElementById('browserViewportFrame');
+                frame.removeAttribute('srcdoc');
+                frame.src = 'about:blank';
+                document.getElementById('browserAddressBar').value = '';
+            }
+        }
+
+        function selectBrowserTab(tabId) {
+            window.activeBrowserTabId = tabId;
+            renderBrowserTabs();
+        }
+
+        function closeBrowserTab(event, tabId) {
+            if (event) event.stopPropagation();
+
+            if (window.browserTabs.length === 1) {
+                window.browserTabs[0] = {
+                    id: 'tab-' + Date.now(),
+                    title: 'Nova Aba',
+                    url: '',
+                    site: null
+                };
+                window.activeBrowserTabId = window.browserTabs[0].id;
+            } else {
+                const index = window.browserTabs.findIndex(t => t.id === tabId);
+                window.browserTabs = window.browserTabs.filter(t => t.id !== tabId);
+                if (window.activeBrowserTabId === tabId) {
+                    const newIndex = Math.max(0, index - 1);
+                    window.activeBrowserTabId = window.browserTabs[newIndex].id;
+                }
+            }
+            renderBrowserTabs();
+        }
+
+        function getActiveBrowserTab() {
+            return window.browserTabs.find(t => t.id === window.activeBrowserTabId) || window.browserTabs[0];
+        }
+
+        function updateActiveBrowserTabUI() {
+            const activeTab = getActiveBrowserTab();
+            if (!activeTab) return;
+
+            document.getElementById('browserAddressBar').value = activeTab.url || '';
+            clearConsoleLog('browserConsoleLogs');
+
+            const btnInspect = document.getElementById('btnInspectCurrentSite');
+            const btnOpenExternal = document.getElementById('btnOpenExternalTab');
+            const btnToggleConsole = document.getElementById('btnToggleBrowserConsole');
+            const consolePanel = document.getElementById('browserConsolePanel');
+
+            if (activeTab.site) {
+                const isOwner = window.currentUser && activeTab.site.ownerUsername === window.currentUser.username;
+                
+                // Valida Licença de Ver Código
+                if (activeTab.site.lockCode && !isOwner) {
+                    btnInspect.classList.add('hidden');
+                } else {
+                    btnInspect.classList.remove('hidden');
+                }
+
+                // Valida Licença de Aba Externa
+                if (activeTab.site.lockExternal && !isOwner) {
+                    btnOpenExternal.classList.add('hidden');
+                } else {
+                    btnOpenExternal.classList.remove('hidden');
+                }
+
+                // Valida Licença do Console
+                if (activeTab.site.lockConsole && !isOwner) {
+                    btnToggleConsole.classList.add('opacity-40', 'cursor-not-allowed');
+                    consolePanel.classList.add('hidden');
+                    consolePanel.classList.remove('flex');
+                } else {
+                    btnToggleConsole.classList.remove('opacity-40', 'cursor-not-allowed');
+                }
+
+            } else {
+                btnInspect.classList.remove('hidden');
+                btnOpenExternal.classList.remove('hidden');
+                btnToggleConsole.classList.remove('opacity-40', 'cursor-not-allowed');
+            }
+
+            const frame = document.getElementById('browserViewportFrame');
+            if (activeTab.site) {
+                frame.removeAttribute('src');
+                frame.srcdoc = fullCompiledHTML(activeTab.site.html, activeTab.site.css, activeTab.site.js);
+            } else if (activeTab.url) {
+                frame.removeAttribute('srcdoc');
+                frame.src = activeTab.url;
+            } else {
+                frame.removeAttribute('srcdoc');
+                frame.src = 'about:blank';
+            }
+        }
+
+        function initCategoryFilters() {
+            const categories = ['Todos', 'Portfolio', 'Jogos', 'Blogs', 'Ferramentas'];
+            const container = document.getElementById('categoryFilters');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="px-4 py-1.5 rounded-full text-xs font-medium border transition-all ${
+                    window.selectedCategory === cat 
+                    ? 'bg-google-blue text-white border-google-blue shadow-sm' 
+                    : 'bg-white dark:bg-google-darkCard text-gray-700 dark:text-gray-300 border-gray-200 dark:border-google-darkBorder hover:border-google-blue'
+                }">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            window.selectedCategory = cat;
+            initCategoryFilters();
+            renderSearchResults();
+        }
+
+        function renderSearchResults() {
+            const query = (document.getElementById('mainSearchInput').value || '').toLowerCase();
+            const sites = getSavedSites();
+            const grid = document.getElementById('sitesGrid');
+            const noResults = document.getElementById('noResultsState');
+
+            document.getElementById('clearSearchBtn').classList.toggle('hidden', query.length === 0);
+
+            const filtered = sites.filter(site => {
+                const matchesCat = window.selectedCategory === 'Todos' || site.category === window.selectedCategory;
+                const matchesQuery = (site.title || '').toLowerCase().includes(query) || 
+                                     (site.description || '').toLowerCase().includes(query) || 
+                                     (site.author || '').toLowerCase().includes(query) ||
+                                     (site.slug || '').toLowerCase().includes(query);
+                return matchesCat && matchesQuery;
+            });
+
+            document.getElementById('resultsCount').innerText = `${filtered.length} site(s) no Firestore`;
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '';
+                noResults.classList.remove('hidden');
+                noResults.classList.add('flex');
+                return;
+            }
+
+            noResults.classList.add('hidden');
+            noResults.classList.remove('flex');
+
+            const currentUsername = window.currentUser ? window.currentUser.username : null;
+
+            grid.innerHTML = filtered.map(site => {
+                const isOwner = currentUsername && site.ownerUsername === currentUsername;
+                const canEdit = isOwner || !site.lockEdit;
+
+                return `
+                <div class="bg-white dark:bg-google-darkCard rounded-xl border border-gray-200 dark:border-google-darkBorder overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group">
+                    <div class="h-36 bg-gray-100 dark:bg-gray-800 relative overflow-hidden border-b border-gray-100 dark:border-google-darkBorder">
+                        <iframe srcdoc="${escapeHtml(fullCompiledHTML(site.html, site.css, site.js))}" class="w-[200%] h-[200%] scale-50 origin-top-left pointer-events-none border-0"></iframe>
+                        <span class="absolute top-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                            ${site.category || 'Geral'}
+                        </span>
+                        ${isOwner ? `
+                        <button onclick="deleteSite('${site.id}', '${escapeHtml(site.title)}')" class="absolute top-2 left-2 bg-red-500/80 hover:bg-red-600 text-white p-1.5 rounded-full text-xs transition-colors" title="Excluir Site">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                        ` : ''}
+                    </div>
+
+                    <div class="p-4 flex-1 flex flex-col">
+                        <div class="flex items-center space-x-1.5 text-[11px] text-google-blue font-mono mb-1 truncate">
+                            <i class="fa-solid fa-link text-[10px]"></i>
+                            <span>https://ar-weblab.app/docsite/${site.slug}</span>
+                        </div>
+                        <h3 class="font-bold text-gray-800 dark:text-white text-base group-hover:text-google-blue transition-colors line-clamp-1">
+                            ${escapeHtml(site.title)}
+                        </h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 line-clamp-2 flex-1">
+                            ${escapeHtml(site.description)}
+                        </p>
+
+                        <div class="flex items-center justify-between text-xs text-gray-400 border-t border-gray-100 dark:border-google-darkBorder pt-3 mt-3">
+                            <span class="flex items-center gap-1 font-medium text-gray-600 dark:text-gray-300">
+                                <i class="fa-regular fa-user text-xs"></i> ${escapeHtml(site.author)}
+                            </span>
+                            <div class="flex items-center space-x-3">
+                                <span><i class="fa-regular fa-eye"></i> ${site.views || 0}</span>
+                                <button onclick="likeSite('${site.id}')" class="hover:text-google-red transition-colors">
+                                    <i class="fa-regular fa-heart"></i> ${site.likes || 0}
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 mt-4">
+                            <button onclick="openInBrowser('${site.id}')" class="w-full py-1.5 bg-google-blue hover:bg-google-hoverBlue text-white rounded-lg text-xs font-semibold flex items-center justify-center space-x-1 transition-colors">
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                                <span>Abrir Site</span>
+                            </button>
+                            ${canEdit ? `
+                            <button onclick="editSiteCode('${site.id}')" class="w-full py-1.5 bg-gray-100 dark:bg-google-darkBorder hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 rounded-lg text-xs font-medium flex items-center justify-center space-x-1 transition-colors">
+                                <i class="fa-solid fa-code text-[10px]"></i>
+                                <span>Editar</span>
+                            </button>
+                            ` : `
+                            <button disabled class="w-full py-1.5 bg-gray-200 dark:bg-gray-800 text-gray-400 rounded-lg text-xs font-medium flex items-center justify-center space-x-1 cursor-not-allowed" title="Edição bloqueada pelo criador">
+                                <i class="fa-solid fa-lock text-[10px]"></i>
+                                <span>Protegido</span>
+                            </button>
+                            `}
+                        </div>
+                    </div>
+                </div>
+            `}).join('');
+        }
+
+        function clearSearch() {
+            document.getElementById('mainSearchInput').value = '';
+            renderSearchResults();
+        }
+
+        function handleHeaderSearch(e) {
+            if (e.key === 'Enter') {
+                const val = e.target.value;
+                document.getElementById('mainSearchInput').value = val;
+                switchTab('search');
+            }
+        }
+
+        function switchCodeTab(tab) {
+            window.activeCodeTab = tab;
+            ['html', 'css', 'js'].forEach(t => {
+                const btn = document.getElementById(`tab-btn-${t}`);
+                const area = document.getElementById(`code${t.toUpperCase()}`);
+                if (t === tab) {
+                    btn.className = `px-4 py-2.5 bg-gray-950 text-${t==='html'?'orange':t==='css'?'blue':'yellow'}-400 border-t-2 border-${t==='html'?'orange':t==='css'?'blue':'yellow'}-500 font-medium flex items-center space-x-2 outline-none`;
+                    area.classList.remove('hidden');
+                } else {
+                    btn.className = 'px-4 py-2.5 text-gray-400 hover:text-gray-200 border-t-2 border-transparent font-medium flex items-center space-x-2 outline-none';
+                    area.classList.add('hidden');
+                }
+            });
+        }
+
+        function fullCompiledHTML(html, css, js) {
+            return `<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        ${css || ''}
+        .arnopotch-watermark {
+            position: fixed; bottom: 12px; right: 12px; z-index: 999999;
+            background: rgba(0, 0, 0, 0.6); color: #ffffff;
+            font-family: sans-serif; font-size: 11px; font-weight: 500;
+            padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: none;
+            user-select: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); opacity: 0.85;
+        }
+        .arnopotch-watermark::after { content: "Arnopotch Weblab"; }
+        @media (max-width: 640px) { .arnopotch-watermark::after { content: "AW dev"; } }
+    </style>
+</head>
+<body>
+    ${html || ''}
+    <div class="arnopotch-watermark"></div>
+    <script>
+        (function() {
+            function sendLog(level, args) {
+                try {
+                    const msg = Array.from(args).map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+                    window.parent.postMessage({ type: 'IFRAME_CONSOLE', level: level, message: msg }, '*');
+                } catch(e) {}
+            }
+            const oldLog = console.log; console.log = function() { sendLog('log', arguments); oldLog.apply(console, arguments); };
+            const oldWarn = console.warn; console.warn = function() { sendLog('warn', arguments); oldWarn.apply(console, arguments); };
+            const oldError = console.error; console.error = function() { sendLog('error', arguments); oldError.apply(console, arguments); };
+            window.onerror = function(msg, url, line) { sendLog('error', ["Erro: " + msg + " (Linha: " + line + ")"]); };
+
+            window.open = function(url) {
+                if (url && url.trim() !== '') {
+                    window.parent.postMessage({ type: 'OPEN_WINDOW', url: url }, '*');
+                }
+                return null;
+            };
+
+            document.addEventListener('click', function(e) {
+                const target = e.target.closest('a');
+                if (target && target.getAttribute('target') === '_blank') {
+                    e.preventDefault();
+                    const href = target.getAttribute('href');
+                    if (href && href.trim() !== '' && href !== '#') {
+                        window.parent.postMessage({ type: 'OPEN_WINDOW', url: href }, '*');
+                    }
+                }
+            }, true);
+        })();
+        try { ${js || ''} } catch (err) { console.error("Erro no JS: " + err.message); }
+    <\/script>
+</body>
+</html>`;
+        }
+
+        function schedulePreviewUpdate() {
+            clearTimeout(window.previewUpdateTimer);
+            window.previewUpdateTimer = setTimeout(updatePreviewNow, 400);
+        }
+
+        function updatePreviewNow() {
+            clearConsoleLog('editorConsoleLogs');
+            const html = document.getElementById('codeHTML').value;
+            const css = document.getElementById('codeCSS').value;
+            const js = document.getElementById('codeJS').value;
+
+            const frame = document.getElementById('livePreviewFrame');
+            frame.srcdoc = fullCompiledHTML(html, css, js);
+        }
+
+        function createNewSite() {
+            window.currentEditingSiteId = null;
+            document.getElementById('editorSiteTitle').value = 'Meu Novo Site';
+            document.getElementById('codeHTML').value = `<div class="box">
+  <h1>🚀 Bem-vindo ao meu novo site!</h1>
+  <p>Conectado em tempo real com o Firebase Cloud Firestore.</p>
+</div>`;
+            document.getElementById('codeCSS').value = `body {
+  font-family: Arial, sans-serif;
+  background-color: #f4f6f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+}
+.box {
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}`;
+            document.getElementById('codeJS').value = `console.log('Site pronto para salvar no Firestore!');`;
+            switchTab('editor');
+        }
+
+        function editSiteCode(siteId) {
+            const sites = getSavedSites();
+            const site = sites.find(s => s.id === siteId);
+            if (site) {
+                const isOwner = window.currentUser && site.ownerUsername === window.currentUser.username;
+                if (site.lockEdit && !isOwner) {
+                    alert("O proprietário deste site bloqueou a edição por terceiros.");
+                    return;
+                }
+
+                window.currentEditingSiteId = site.id;
+                document.getElementById('editorSiteTitle').value = site.title;
+                document.getElementById('codeHTML').value = site.html || '';
+                document.getElementById('codeCSS').value = site.css || '';
+                document.getElementById('codeJS').value = site.js || '';
+                switchTab('editor');
+            }
+        }
+
+        function loadTemplate(templateKey) {
+            if (!templateKey) return;
+            if (templateKey === 'blank') {
+                createNewSite();
+            } else if (templateKey === 'portfolio') {
+                document.getElementById('codeHTML').value = `<h1>Meu Portfólio</h1><p>Desenvolvedor Web</p>`;
+                document.getElementById('codeCSS').value = `body { background: #111; color: #fff; text-align: center; font-family: sans-serif; padding-top: 50px; }`;
+                document.getElementById('codeJS').value = `console.log('Portfólio carregado');`;
+            }
+            updatePreviewNow();
+        }
+
+        function setViewport(width) {
+            const container = document.getElementById('previewContainer');
+            container.style.maxWidth = width;
+            ['desktop', 'tablet', 'mobile'].forEach(vp => {
+                const btn = document.getElementById(`vp-${vp}`);
+                if ((vp==='desktop'&&width==='100%') || (vp==='tablet'&&width==='768px') || (vp==='mobile'&&width==='375px')) {
+                    btn.className = "px-2.5 py-1 rounded text-xs bg-gray-700 text-white font-medium transition-colors";
+                } else {
+                    btn.className = "px-2.5 py-1 rounded text-xs text-gray-400 hover:text-white transition-colors";
+                }
+            });
+        }
+
+        function formatCode() {
+            ['codeHTML', 'codeCSS', 'codeJS'].forEach(id => {
+                const el = document.getElementById(id);
+                el.value = el.value.trim();
+            });
+            updatePreviewNow();
+        }
+
+        function openPublishModal() {
+            if (!window.currentUser) {
+                alert("Você precisa estar logado para publicar!");
+                document.getElementById('authScreen').classList.remove('hidden');
+                return;
+            }
+
+            const title = document.getElementById('editorSiteTitle').value || 'Meu Site';
+            document.getElementById('pubTitle').value = title;
+            document.getElementById('pubSlug').value = title.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            document.getElementById('pubDesc').value = '';
+            document.getElementById('pubLockCode').checked = false;
+            document.getElementById('pubLockEdit').checked = false;
+            document.getElementById('pubLockExternal').checked = false;
+            document.getElementById('pubLockConsole').checked = false;
+            document.getElementById('publishModal').classList.remove('hidden');
+        }
+
+        function closePublishModal() {
+            document.getElementById('publishModal').classList.add('hidden');
+        }
+
+        function openInBrowser(siteId) {
+            const sites = getSavedSites();
+            const site = sites.find(s => s.id === siteId);
+            if (!site) return;
+
+            const activeTab = getActiveBrowserTab();
+            activeTab.site = site;
+            activeTab.title = site.title;
+            activeTab.url = `https://ar-weblab.app/docsite/${site.slug}`;
+
+            if (window.incrementViews) {
+                window.incrementViews(siteId);
+            }
+
+            renderBrowserTabs();
+            switchTab('browser');
+        }
+
+        function handleAddressBarSubmit(e) {
+            e.preventDefault();
+            let inputUrl = document.getElementById('browserAddressBar').value.trim();
+            if (!inputUrl) return;
+
+            loadUrlInCurrentTab(inputUrl);
+        }
+
+        function loadUrlInCurrentTab(inputUrl) {
+            const activeTab = getActiveBrowserTab();
+            const sites = getSavedSites();
+            const siteMatch = sites.find(s => 
+                inputUrl.includes(`/docsite/${s.slug}`) || 
+                (s.slug && s.slug.toLowerCase() === inputUrl.toLowerCase()) ||
+                (s.title && s.title.toLowerCase().includes(inputUrl.toLowerCase()))
+            );
+
+            if (siteMatch) {
+                activeTab.site = siteMatch;
+                activeTab.title = siteMatch.title;
+                activeTab.url = `https://ar-weblab.app/docsite/${siteMatch.slug}`;
+                if (window.incrementViews) window.incrementViews(siteMatch.id);
+            } else {
+                let finalUrl = inputUrl;
+                if (!/^https?:\/\//i.test(finalUrl)) {
+                    if (finalUrl.includes('.')) {
+                        finalUrl = 'https://' + finalUrl;
+                    } else {
+                        document.getElementById('mainSearchInput').value = inputUrl;
+                        switchTab('search');
+                        return;
+                    }
+                }
+
+                activeTab.site = null;
+                activeTab.title = finalUrl.replace(/^https?:\/\//, '');
+                activeTab.url = finalUrl;
+            }
+
+            renderBrowserTabs();
+        }
+
+        function openCurrentInNewTab() {
+            const activeTab = getActiveBrowserTab();
+            if (activeTab) {
+                const isOwner = window.currentUser && activeTab.site && activeTab.site.ownerUsername === window.currentUser.username;
+                if (activeTab.site && activeTab.site.lockExternal && !isOwner) {
+                    alert("O proprietário deste site impediu que ele seja aberto fora da plataforma.");
+                    return;
+                }
+
+                if (activeTab.site) {
+                    const compiledHTML = fullCompiledHTML(
+                        activeTab.site.html, 
+                        activeTab.site.css, 
+                        activeTab.site.js
+                    );
+                    
+                    const newWindow = window.open('', '_blank');
+                    if (newWindow) {
+                        newWindow.document.open();
+                        newWindow.document.write(compiledHTML);
+                        newWindow.document.close();
+                    }
+                } else if (activeTab.url) {
+                    window.open(activeTab.url, '_blank');
+                }
+            }
+        }
+
+        function reloadBrowserFrame() {
+            updateActiveBrowserTabUI();
+        }
+
+        function inspectCurrentSite() {
+            const activeTab = getActiveBrowserTab();
+            if (activeTab && activeTab.site) {
+                editSiteCode(activeTab.site.id);
+            }
+        }
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+        }
+
+        function escapeHtml(str) {
+            return (str || '').replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                if (window.activeTab === 'editor') openPublishModal();
+            }
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                if (window.activeTab === 'editor') {
+                    e.preventDefault();
+                    updatePreviewNow();
+                }
+            }
+        });
+
+        window.onload = function() {
+            initCategoryFilters();
+            createNewSite();
+            switchTab('search');
+        };
+    </script>
+</body>
+</html>
