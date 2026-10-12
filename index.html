@@ -1435,32 +1435,43 @@
         }
 
         function openCurrentInNewTab() {
-            const activeTab = getActiveBrowserTab();
-            if (activeTab) {
-                const isOwner = window.currentUser && activeTab.site && activeTab.site.ownerUsername === window.currentUser.username;
-                if (activeTab.site && activeTab.site.lockExternal && !isOwner) {
-                    alert("O proprietário deste site impediu que ele seja aberto fora da plataforma.");
-                    return;
-                }
+    const activeTab = getActiveBrowserTab();
 
-                if (activeTab.site) {
-                    const compiledHTML = fullCompiledHTML(
-                        activeTab.site.html, 
-                        activeTab.site.css, 
-                        activeTab.site.js
-                    );
-                    
-                    const newWindow = window.open('', '_blank');
-                    if (newWindow) {
-                        newWindow.document.open();
-                        newWindow.document.write(compiledHTML);
-                        newWindow.document.close();
-                    }
-                } else if (activeTab.url) {
-                    window.open(activeTab.url, '_blank');
-                }
-            }
+    if (!activeTab) {
+        alert("Nenhuma aba está aberta.");
+        return;
+    }
+
+    if (activeTab.site) {
+        const site = activeTab.site;
+
+        const isOwner =
+            window.currentUser &&
+            site.ownerUsername === window.currentUser.username;
+
+        if (site.lockExternal && !isOwner) {
+            alert("O proprietário deste site impediu a abertura externa.");
+            return;
         }
+
+        const url = new URL(
+            "site.html",
+            "https://stargamesbrasil.github.io/weblab/"
+        );
+
+        url.searchParams.set("id", site.id);
+
+        window.open(url.href, "_blank");
+        return;
+    }
+
+    if (activeTab.url) {
+        window.open(activeTab.url, "_blank");
+        return;
+    }
+
+    alert("Não foi possível abrir esta página.");
+}
 
         function reloadBrowserFrame() {
             updateActiveBrowserTabUI();
