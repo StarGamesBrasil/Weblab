@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -26,7 +25,7 @@
 <body>
   <div id="status">Carregando site...</div>
   <iframe id="siteFrame"
-    sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox">
+    sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox allow-same-origin">
   </iframe>
 
   <script type="module">
@@ -55,6 +54,15 @@
     const db = getFirestore(app);
     const status = document.getElementById("status");
     const frame = document.getElementById("siteFrame");
+
+    // Ouve requisições de abertura de janela vindas de dentro do iframe
+    window.addEventListener('message', function(event) {
+        if (event.data && event.data.type === 'OPEN_WINDOW') {
+            if (event.data.url && event.data.url.trim() !== '') {
+                window.open(event.data.url, '_blank');
+            }
+        }
+    });
 
     async function loadSite() {
       const params = new URLSearchParams(location.search);
@@ -103,21 +111,54 @@
       const css = site.css || "";
       const js = site.js || "";
 
+      // Compilação idêntica ao WebLab para incluir marca d'água e tratamento de links externos
       const source = `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>${css}</style>
+<style>
+  ${css}
+  .arnopotch-watermark {
+      position: fixed; bottom: 12px; right: 12px; z-index: 999999;
+      background: rgba(0, 0, 0, 0.6); color: #ffffff;
+      font-family: sans-serif; font-size: 11px; font-weight: 500;
+      padding: 4px 10px; border-radius: 20px; backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.2); pointer-events: none;
+      user-select: none; box-shadow: 0 2px 8px rgba(0,0,0,0.2); opacity: 0.85;
+  }
+  .arnopotch-watermark::after { content: "Arnopotch Weblab"; }
+  @media (max-width: 640px) { .arnopotch-watermark::after { content: "AW dev"; } }
+</style>
 </head>
 <body>
 ${html}
+<div class="arnopotch-watermark"></div>
 <script>
-try {
-  ${js}
-} catch (error) {
-  console.error("Erro no site:", error);
-}
+    (function() {
+        window.open = function(url) {
+            if (url && url.trim() !== '') {
+                window.parent.postMessage({ type: 'OPEN_WINDOW', url: url }, '*');
+            }
+            return null;
+        };
+
+        document.addEventListener('click', function(e) {
+            const target = e.target.closest('a');
+            if (target && target.getAttribute('target') === '_blank') {
+                e.preventDefault();
+                const href = target.getAttribute('href');
+                if (href && href.trim() !== '' && href !== '#') {
+                    window.parent.postMessage({ type: 'OPEN_WINDOW', url: href }, '*');
+                }
+            }
+        }, true);
+    })();
+    try {
+      ${js}
+    } catch (error) {
+      console.error("Erro no site:", error);
+    }
 <\/script>
 </body>
 </html>`;
@@ -134,3 +175,4 @@ try {
   </script>
 </body>
 </html>
+
