@@ -1,1 +1,136 @@
 
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Site publicado — WebLab</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; }
+    body { font-family: Arial, sans-serif; background: #f3f4f6; }
+    #status {
+      padding: 24px;
+      text-align: center;
+      color: #555;
+    }
+    #siteFrame {
+      display: none;
+      width: 100%;
+      height: 100vh;
+      border: 0;
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="status">Carregando site...</div>
+  <iframe id="siteFrame"
+    sandbox="allow-scripts allow-forms allow-popups allow-popups-to-escape-sandbox">
+  </iframe>
+
+  <script type="module">
+    import { initializeApp, getApps }
+      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+
+    import {
+      getFirestore, collection, getDoc, doc,
+      getDocs, query, where, limit
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyAAOcFu9jaKq4B-h9rDoKKV_SWBTqm4Cgs",
+      authDomain: "arnopotch.firebaseapp.com",
+      projectId: "arnopotch",
+      storageBucket: "arnopotch.firebasestorage.app",
+      messagingSenderId: "898836334119",
+      appId: "1:898836334119:web:ef03fcef71112b1f517002",
+      measurementId: "G-48FWKYK43L"
+    };
+
+    const app = getApps().length
+      ? getApps()[0]
+      : initializeApp(firebaseConfig);
+
+    const db = getFirestore(app);
+    const status = document.getElementById("status");
+    const frame = document.getElementById("siteFrame");
+
+    async function loadSite() {
+      const params = new URLSearchParams(location.search);
+      const id = params.get("id");
+      const slug = params.get("slug");
+
+      if (!id && !slug) {
+        throw new Error("Este link não identifica nenhum site.");
+      }
+
+      let site = null;
+
+      if (id) {
+        const snapshot = await getDoc(doc(db, "sites", id));
+        if (snapshot.exists()) {
+          site = { id: snapshot.id, ...snapshot.data() };
+        }
+      } else {
+        const safeSlug = slug.toLowerCase();
+
+        if (!/^[a-z0-9-]{1,70}$/.test(safeSlug)) {
+          throw new Error("O endereço deste site é inválido.");
+        }
+
+        const q = query(
+          collection(db, "sites"),
+          where("slug", "==", safeSlug),
+          limit(1)
+        );
+
+        const result = await getDocs(q);
+
+        if (!result.empty) {
+          const d = result.docs[0];
+          site = { id: d.id, ...d.data() };
+        }
+      }
+
+      if (!site) {
+        throw new Error("Site não encontrado ou ainda não publicado.");
+      }
+
+      document.title = site.title || "Site publicado — WebLab";
+
+      const html = site.html || "";
+      const css = site.css || "";
+      const js = site.js || "";
+
+      const source = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>${css}</style>
+</head>
+<body>
+${html}
+<script>
+try {
+  ${js}
+} catch (error) {
+  console.error("Erro no site:", error);
+}
+<\/script>
+</body>
+</html>`;
+
+      frame.srcdoc = source;
+      frame.style.display = "block";
+      status.style.display = "none";
+    }
+
+    loadSite().catch(error => {
+      status.textContent = error.message;
+      console.error(error);
+    });
+  </script>
+</body>
+</html>
