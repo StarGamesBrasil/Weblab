@@ -743,7 +743,6 @@
 
                 await setDoc(doc(db, "sites", docId), siteData, { merge: true });
 
-                // ATUALIZA O NÓ DO USUÁRIO NO FIREBASE (users/{username}/mySites)
                 const userRef = doc(db, "users", window.currentUser.username);
                 await updateDoc(userRef, {
                     mySites: arrayUnion({ id: docId, title: title, slug: slug })
@@ -761,7 +760,6 @@
             }
         };
 
-        // FUNÇÃO DE EXCLUSÃO
         window.deleteSite = async function(siteId, title) {
             if (!window.currentUser) {
                 alert("Você precisa estar logado para excluir um site.");
@@ -828,7 +826,6 @@
                 const activeTab = getActiveBrowserTab();
                 const isOwner = window.currentUser && activeTab.site && activeTab.site.ownerUsername === window.currentUser.username;
                 
-                // Se o console for bloqueado no site e o usuário não for o proprietário, ignora mensagens no console do navegador
                 if (activeTab.site && activeTab.site.lockConsole && !isOwner) {
                     return;
                 }
@@ -1013,21 +1010,18 @@
             if (activeTab.site) {
                 const isOwner = window.currentUser && activeTab.site.ownerUsername === window.currentUser.username;
                 
-                // Valida Licença de Ver Código
                 if (activeTab.site.lockCode && !isOwner) {
                     btnInspect.classList.add('hidden');
                 } else {
                     btnInspect.classList.remove('hidden');
                 }
 
-                // Valida Licença de Aba Externa
                 if (activeTab.site.lockExternal && !isOwner) {
                     btnOpenExternal.classList.add('hidden');
                 } else {
                     btnOpenExternal.classList.remove('hidden');
                 }
 
-                // Valida Licença do Console
                 if (activeTab.site.lockConsole && !isOwner) {
                     btnToggleConsole.classList.add('opacity-40', 'cursor-not-allowed');
                     consolePanel.classList.add('hidden');
@@ -1435,43 +1429,34 @@
         }
 
         function openCurrentInNewTab() {
-    const activeTab = getActiveBrowserTab();
+            const activeTab = getActiveBrowserTab();
 
-    if (!activeTab) {
-        alert("Nenhuma aba está aberta.");
-        return;
-    }
+            if (!activeTab) {
+                alert("Nenhuma aba está aberta.");
+                return;
+            }
 
-    if (activeTab.site) {
-        const site = activeTab.site;
+            if (activeTab.site) {
+                const site = activeTab.site;
+                const isOwner = window.currentUser && site.ownerUsername === window.currentUser.username;
 
-        const isOwner =
-            window.currentUser &&
-            site.ownerUsername === window.currentUser.username;
+                if (site.lockExternal && !isOwner) {
+                    alert("O proprietário deste site impediu a abertura externa.");
+                    return;
+                }
 
-        if (site.lockExternal && !isOwner) {
-            alert("O proprietário deste site impediu a abertura externa.");
-            return;
+                const externalUrl = `https://stargamesbrasil.github.io/weblab/site.html?id=${encodeURIComponent(site.id)}`;
+                window.open(externalUrl, "_blank");
+                return;
+            }
+
+            if (activeTab.url) {
+                window.open(activeTab.url, "_blank");
+                return;
+            }
+
+            alert("Não foi possível abrir esta página.");
         }
-
-        const url = new URL(
-            "site.html",
-            "https://stargamesbrasil.github.io/weblab/"
-        );
-
-        url.searchParams.set("id", site.id);
-
-        window.open(url.href, "_blank");
-        return;
-    }
-
-    if (activeTab.url) {
-        window.open(activeTab.url, "_blank");
-        return;
-    }
-
-    alert("Não foi possível abrir esta página.");
-}
 
         function reloadBrowserFrame() {
             updateActiveBrowserTabUI();
