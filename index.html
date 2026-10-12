@@ -1429,34 +1429,38 @@
         }
 
         function openCurrentInNewTab() {
-            const activeTab = getActiveBrowserTab();
+    const activeTab = getActiveBrowserTab();
 
-            if (!activeTab) {
-                alert("Nenhuma aba está aberta.");
-                return;
-            }
+    if (!activeTab) {
+        alert("Nenhuma aba está aberta.");
+        return;
+    }
 
-            if (activeTab.site) {
-                const site = activeTab.site;
-                const isOwner = window.currentUser && site.ownerUsername === window.currentUser.username;
+    if (activeTab.site) {
+        const site = activeTab.site;
+        const isOwner = window.currentUser && site.ownerUsername === window.currentUser.username;
 
-                if (site.lockExternal && !isOwner) {
-                    alert("O proprietário deste site impediu a abertura externa.");
-                    return;
-                }
-
-                const externalUrl = `https://stargamesbrasil.github.io/weblab/site.html?id=${encodeURIComponent(site.id)}`;
-                window.open(externalUrl, "_blank");
-                return;
-            }
-
-            if (activeTab.url) {
-                window.open(activeTab.url, "_blank");
-                return;
-            }
-
-            alert("Não foi possível abrir esta página.");
+        if (site.lockExternal && !isOwner) {
+            alert("O proprietário deste site impediu a abertura externa.");
+            return;
         }
+
+        // Pega a URL atual do GitHub Pages e aponta para o site.html na mesma pasta
+        const baseUrl = window.location.origin + window.location.pathname.replace(/\/[^\/]*$/, '/');
+        const externalUrl = `${baseUrl}site.html?id=${encodeURIComponent(site.id)}`;
+        
+        window.open(externalUrl, "_blank");
+        return;
+    }
+
+    if (activeTab.url) {
+        window.open(activeTab.url, "_blank");
+        return;
+    }
+
+    alert("Não foi possível abrir esta página.");
+}
+
 
         function reloadBrowserFrame() {
             updateActiveBrowserTabUI();
