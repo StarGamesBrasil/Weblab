@@ -890,7 +890,6 @@
                 const tagsRaw = document.getElementById('pubTags').value || '';
                 const tags = tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
 
-                // Simple thumbnail generation (first 200 chars of html as indicator)
                 const thumbnail = document.getElementById('codeHTML').value.substring(0, 300);
 
                 const siteData = {
@@ -968,7 +967,7 @@
                     todayEntry.count = (todayEntry.count || 0) + 1;
                 } else {
                     history.push({ date: today, count: 1 });
-                    history = history.slice(-30); // keep last 30 days
+                    history = history.slice(-30);
                 }
                 await updateDoc(doc(db, "sites", siteId), { 
                     views: increment(1),
@@ -1100,7 +1099,6 @@
             document.getElementById('analyticsViews').textContent = site.views || 0;
             document.getElementById('analyticsLikes').textContent = site.likes || 0;
             
-            // Count comments (async, approximate)
             document.getElementById('analyticsComments').textContent = '...';
             getDocs(query(collection(db, "comments"), limit(100))).then(snap => {
                 let count = 0;
@@ -1108,9 +1106,8 @@
                 document.getElementById('analyticsComments').textContent = count;
             });
 
-            // Chart
             const history = site.viewHistory || [];
-            const labels = history.map(h => h.date.slice(5)); // MM-DD
+            const labels = history.map(h => h.date.slice(5));
             const data = history.map(h => h.count || 0);
             
             const ctx = document.getElementById('analyticsChart').getContext('2d');
@@ -1166,8 +1163,7 @@ document.body.appendChild(glow);
 document.addEventListener('mousemove',e=>{glow.style.left=e.clientX+'px';glow.style.top=e.clientY+'px'});
 document.addEventListener('mousedown',()=>{glow.style.width='40px';glow.style.height='40px'});
 document.addEventListener('mouseup',()=>{glow.style.width='20px';glow.style.height='20px'});` },
-            { name: "Typewriter", cat: "Texto", code: `function typeWriter(el,text,speed=50){el.textContent='';let i=0;const t=setInterval(()=>{el.textContent+=text[i];i++;if(i>=text.length)clearInterval(t)},speed)}
-// Uso: typeWriter(document.querySelector('h1'), 'Olá, mundo!');` },
+            { name: "Typewriter", cat: "Texto", code: `function typeWriter(el,text,speed=50){el.textContent='';let i=0;const t=setInterval(()=>{el.textContent+=text[i];i++;if(i>=text.length)clearInterval(t)},speed)}` },
             { name: "Smooth Scroll", cat: "Utilitário", code: `document.querySelectorAll('a[href^="#"]').forEach(a=>{
   a.addEventListener('click',e=>{
     e.preventDefault();
@@ -1178,8 +1174,7 @@ document.addEventListener('mouseup',()=>{glow.style.width='20px';glow.style.heig
 btn.textContent='🌙';
 btn.style.cssText='position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;border:none;background:#1a73e8;color:white;font-size:20px;cursor:pointer;z-index:999;box-shadow:0 4px 12px rgba(0,0,0,0.3)';
 btn.onclick=()=>{document.body.classList.toggle('dark');btn.textContent=document.body.classList.contains('dark')?'☀️':'🌙'};
-document.body.appendChild(btn);
-// Adicione no CSS: body.dark{background:#111;color:#eee}` },
+document.body.appendChild(btn);` },
             { name: "Drag & Drop", cat: "Interação", code: `document.querySelectorAll('.draggable').forEach(el=>{
   el.style.cursor='grab';
   el.addEventListener('mousedown',e=>{
@@ -1190,11 +1185,8 @@ document.body.appendChild(btn);
     document.addEventListener('mousemove',move);
     document.addEventListener('mouseup',up);
   });
-});
-// Adicione class="draggable" nos elementos` },
-            { name: "Local Storage Save", cat: "Utilitário", code: `// Salvar
-localStorage.setItem('meuDado', JSON.stringify({nome:'João',score:100}));
-// Carregar
+});` },
+            { name: "Local Storage Save", cat: "Utilitário", code: `localStorage.setItem('meuDado', JSON.stringify({nome:'João',score:100}));
 const data = JSON.parse(localStorage.getItem('meuDado') || '{}');
 console.log(data);` },
             { name: "Countdown Timer", cat: "Utilitário", code: `function startCountdown(seconds, el){
@@ -1204,8 +1196,7 @@ console.log(data);` },
     el.textContent = left + 's';
     if(left<=0){clearInterval(t); el.textContent='Fim!';}
   },200);
-}
-// Uso: startCountdown(10, document.getElementById('timer'));` },
+}` },
             { name: "Random Color", cat: "Utilitário", code: `function randomColor(){return '#'+Math.floor(Math.random()*16777215).toString(16).padStart(6,'0')}
 document.body.style.background = randomColor();` }
         ];
@@ -1243,7 +1234,6 @@ document.body.style.background = randomColor();` }
             panel.classList.toggle('closed');
         }
 
-        // ========== TEMPLATES ==========
         const TEMPLATES = {
             blank: {
                 title: "Página em Branco",
@@ -1261,7 +1251,7 @@ document.body.style.background = randomColor();` }
                 title: "Jogo Canvas - Catch the Orbs",
                 html: `<div class="ui">\n  <div>Score: <span id="score">0</span></div>\n  <div>Melhor: <span id="best">0</span></div>\n</div>\n<canvas id="game"></canvas>\n<div class="overlay" id="startScreen">\n  <h1>Catch the Orbs</h1>\n  <p>Mova o mouse para pegar as orbs</p>\n  <button onclick="startGame()">Jogar</button>\n</div>`,
                 css: `* { margin: 0; padding: 0; box-sizing: border-box; }\nbody { background: #0f172a; overflow: hidden; font-family: system-ui, sans-serif; }\ncanvas { display: block; }\n.ui { position: fixed; top: 16px; left: 16px; color: white; font-size: 1.1rem; z-index: 10; display: flex; gap: 24px; }\n.overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.9); display: flex; flex-direction: column; align-items: center; justify-content: center; color: white; z-index: 20; }\n.overlay h1 { font-size: 2.5rem; margin-bottom: 0.5rem; background: linear-gradient(90deg, #60a5fa, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }\n.overlay p { color: #94a3b8; margin-bottom: 1.5rem; }\n.overlay button { padding: 12px 32px; font-size: 1rem; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }\n.overlay button:hover { background: #2563eb; }`,
-                js: `const canvas = document.getElementById('game');\nconst ctx = canvas.getContext('2d');\ncanvas.width = innerWidth; canvas.height = innerHeight;\nlet score = 0, best = +localStorage.getItem('orbBest') || 0, player = {x:0,y:0,r:18}, orbs = [], running = false;\ndocument.getElementById('best').textContent = best;\n\nfunction spawn() {\n  orbs.push({ x: Math.random()*canvas.width, y: -20, r: 8+Math.random()*10, speed: 2+Math.random()*3, color: \`hsl(\${Math.random()*360},70%,60%)\` });\n}\n\nfunction startGame() {\n  document.getElementById('startScreen').style.display = 'none';\n  score = 0; orbs = []; running = true;\n  document.getElementById('score').textContent = 0;\n  for(let i=0;i<5;i++) spawn();\n  loop();\n}\n\ncanvas.addEventListener('mousemove', e => { player.x = e.clientX; player.y = e.clientY; });\n\nfunction loop() {\n  if (!running) return;\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,canvas.width,canvas.height);\n  // player\n  ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);\n  ctx.fillStyle = '#60a5fa'; ctx.fill();\n  ctx.shadowBlur = 20; ctx.shadowColor = '#60a5fa';\n  // orbs\n  orbs.forEach((o,i) => {\n    o.y += o.speed;\n    ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2);\n    ctx.fillStyle = o.color; ctx.shadowColor = o.color; ctx.fill();\n    const dx = o.x-player.x, dy = o.y-player.y;\n    if (Math.sqrt(dx*dx+dy*dy) < o.r+player.r) {\n      score++; document.getElementById('score').textContent = score;\n      orbs.splice(i,1); spawn();\n      if (score > best) { best = score; localStorage.setItem('orbBest', best); document.getElementById('best').textContent = best; }\n    }\n    if (o.y > canvas.height+20) { orbs.splice(i,1); spawn(); }\n  });\n  ctx.shadowBlur = 0;\n  requestAnimationFrame(loop);\n}\nwindow.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });`
+                js: `const canvas = document.getElementById('game');\nconst ctx = canvas.getContext('2d');\ncanvas.width = innerWidth; canvas.height = innerHeight;\nlet score = 0, best = +localStorage.getItem('orbBest') || 0, player = {x:0,y:0,r:18}, orbs = [], running = false;\ndocument.getElementById('best').textContent = best;\n\nfunction spawn() {\n  orbs.push({ x: Math.random()*canvas.width, y: -20, r: 8+Math.random()*10, speed: 2+Math.random()*3, color: \`hsl(\${Math.random()*360},70%,60%)\` });\n}\n\nfunction startGame() {\n  document.getElementById('startScreen').style.display = 'none';\n  score = 0; orbs = []; running = true;\n  document.getElementById('score').textContent = 0;\n  for(let i=0;i<5;i++) spawn();\n  loop();\n}\n\ncanvas.addEventListener('mousemove', e => { player.x = e.clientX; player.y = e.clientY; });\n\nfunction loop() {\n  if (!running) return;\n  ctx.fillStyle = '#0f172a'; ctx.fillRect(0,0,canvas.width,canvas.height);\n  ctx.beginPath(); ctx.arc(player.x, player.y, player.r, 0, Math.PI*2);\n  ctx.fillStyle = '#60a5fa'; ctx.fill();\n  ctx.shadowBlur = 20; ctx.shadowColor = '#60a5fa';\n  orbs.forEach((o,i) => {\n    o.y += o.speed;\n    ctx.beginPath(); ctx.arc(o.x, o.y, o.r, 0, Math.PI*2);\n    ctx.fillStyle = o.color; ctx.shadowColor = o.color; ctx.fill();\n    const dx = o.x-player.x, dy = o.y-player.y;\n    if (Math.sqrt(dx*dx+dy*dy) < o.r+player.r) {\n      score++; document.getElementById('score').textContent = score;\n      orbs.splice(i,1); spawn();\n      if (score > best) { best = score; localStorage.setItem('orbBest', best); document.getElementById('best').textContent = best; }\n    }\n    if (o.y > canvas.height+20) { orbs.splice(i,1); spawn(); }\n  });\n  ctx.shadowBlur = 0;\n  requestAnimationFrame(loop);\n}\nwindow.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; });`
             },
             calculator: {
                 title: "Calculadora Moderna",
@@ -1435,13 +1425,11 @@ document.body.style.background = randomColor();` }
         async function openProfile(username) {
             const sites = window.firestoreSites.filter(s => s.ownerUsername === username && (!s.isPrivate || (window.currentUser && window.currentUser.username === username)));
             
-            // Try to get full profile data
             let profileData = { displayName: username, bio: '', avatar: '', github: '', twitter: '', website: '' };
             try {
                 const userSnap = await window.db ? await (await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')).getDoc((await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')).doc(window.db, "users", username)) : null;
             } catch(e) {}
             
-            // Use data from sites or current user
             if (window.currentUser && window.currentUser.username === username) {
                 profileData = { ...window.currentUser };
             } else if (sites[0]) {
@@ -1489,21 +1477,36 @@ document.body.style.background = randomColor();` }
         function downloadSite() { document.getElementById('downloadModal').classList.remove('hidden'); }
         function closeDownloadModal() { document.getElementById('downloadModal').classList.add('hidden'); }
 
+        // CORREÇÃO APLICADA AQUI ABAIXO:
         function downloadAsSingleHTML() {
             const title = document.getElementById('editorSiteTitle').value || 'meu-site';
-            const full = `<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${title}</title><style>${document.getElementById('codeCSS').value}</style></head><body>${document.getElementById('codeHTML').value}<script>${document.getElementById('codeJS').value}<\/script>    <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('./service-worker.js')
-                .then(reg => console.log('ServiceWorker registrado com sucesso:', reg.scope))
-                .catch(err => console.log('Falha ao registrar ServiceWorker:', err));
-        });
-    }
-</script>
-</body></html>`;
+            const htmlContent = document.getElementById('codeHTML').value;
+            const cssContent = document.getElementById('codeCSS').value;
+            const jsContent = document.getElementById('codeJS').value;
+
+            const full = '<!DOCTYPE html>\n' +
+                '<html lang="pt-BR">\n<head>\n' +
+                '<meta charset="UTF-8">\n' +
+                '<meta name="viewport" content="width=device-width, initial-scale=1.0">\n' +
+                '<title>' + escapeHtml(title) + '</title>\n' +
+                '<style>' + cssContent + '</style>\n' +
+                '</head>\n<body>\n' +
+                htmlContent + '\n' +
+                '<script>' + jsContent + '<\/script>\n' +
+                '<script>\n' +
+                "if ('serviceWorker' in navigator) {\n" +
+                "    window.addEventListener('load', () => {\n" +
+                "        navigator.serviceWorker.register('./service-worker.js')\n" +
+                "            .then(reg => console.log('ServiceWorker registrado:', reg.scope))\n" +
+                "            .catch(err => console.log('Falha ServiceWorker:', err));\n" +
+                "    });\n" +
+                "}\n" +
+                '<\/script>\n' +
+                '</body>\n</html>';
+
             const a = document.createElement('a');
-            a.href = URL.createObjectURL(new Blob([full], {type:'text/html'}));
-            a.download = title.toLowerCase().replace(/[^a-z0-9]/g,'-') + '.html';
+            a.href = URL.createObjectURL(new Blob([full], { type: 'text/html;charset=utf-8' }));
+            a.download = title.toLowerCase().replace(/[^a-z0-9]/g, '-') + '.html';
             a.click();
             closeDownloadModal();
             showToast("Download iniciado!", "success");
@@ -1739,7 +1742,6 @@ document.body.style.background = randomColor();` }
             else if (tab.url) { frame.removeAttribute('srcdoc'); frame.src = tab.url; }
             else { frame.removeAttribute('srcdoc'); frame.src = 'about:blank'; }
             
-            // Auto load comments if panel open
             if (!document.getElementById('commentsPanel').classList.contains('hidden') && tab.site) {
                 loadComments(tab.site.id);
             }
@@ -1940,7 +1942,6 @@ document.body.style.background = randomColor();` }
             return (str||'').replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
         }
 
-        // ========== PWA / OFFLINE ==========
         if ('serviceWorker' in navigator) {
             const swCode = `
                 const CACHE = 'weblab-v5.5';
