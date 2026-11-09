@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#1a73e8">
     <meta name="description" content="Arnopotch WebLab - Crie, publique e compartilhe sites e jogos na web">
     <link rel="manifest" href="data:application/json;base64,eyJuYW1lIjoiQXJub3BvdGNoIFdlYkxhYiIsInNob3J0X25hbWUiOiJXZWJMYWIiLCJzdGFydF91cmwiOiIuLyIsImRpc3BsYXkiOiJzdGFuZGFsb25lIiwiYmFja2dyb3VuZF9jb2xvciI6IiMyMDIxMjQiLCJ0aGVtZV9jb2xvciI6IiMxYTczZTgiLCJpY29ucyI6W3sic3JjIjoiZGF0YTppbWFnZS9zdmcreG1sO2Jhc2U2NCxQSE4yWnlCNGJXeHVjejBpYUhSMGNEb3ZMM2QzZHk1M015NXZjbWN2TWpBd01DOXpkbWNnTldCdyIsInNpemVzIjoiMTkyeDE5MiIsInR5cGUiOiJpbWFnZS9zdmcreG1sIn1dfQ==">
-    <title>Arnopotch WebLab 5.5 - Buscador & Criador de Web</title>
+    <title>Arnopotch WebLab 7.0 - Buscador & Criador de Web</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -164,7 +164,7 @@
                     <span class="text-blue-500">w</span><span class="text-red-500">e</span><span class="text-yellow-500">b</span><span class="text-blue-500">l</span><span class="text-green-500">a</span><span class="text-red-500">b</span>
                 </div>
                 <span class="bg-blue-100 dark:bg-blue-900/40 text-google-blue dark:text-blue-300 text-xs font-semibold px-2 py-0.5 rounded-full border border-blue-200 dark:border-blue-800">
-                    Arnopotch WebLab 6.0
+                    Arnopotch WebLab 7.0
                 </span>
             </div>
             <nav class="hidden md:flex items-center space-x-1 bg-gray-100 dark:bg-google-darkBg p-1 rounded-full border border-gray-200 dark:border-google-darkBorder">
@@ -290,6 +290,41 @@
                         <i class="fa-solid fa-plus"></i> Novo Site
                     </button>
                 </div>
+
+                <!-- STORAGE OVERVIEW -->
+                <div id="storageOverview" class="mb-8 bg-white dark:bg-google-darkCard rounded-2xl border border-gray-200 dark:border-google-darkBorder shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 dark:border-google-darkBorder flex flex-wrap items-center justify-between gap-3">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
+                                <i class="fa-solid fa-hard-drive text-google-blue text-lg"></i>
+                            </div>
+                            <div>
+                                <h2 class="font-bold text-gray-800 dark:text-white text-sm">Armazenamento</h2>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">1 linha de código = 1 KB · Limite atual: 32 MB</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-lg font-bold text-gray-800 dark:text-white" id="storageUsedLabel">0 KB</div>
+                            <div class="text-xs text-gray-500" id="storageRemainingLabel">de 32 MB disponíveis</div>
+                        </div>
+                    </div>
+                    <div class="px-5 pt-4">
+                        <div class="flex justify-between text-xs mb-1.5">
+                            <span class="text-gray-500 dark:text-gray-400" id="storagePercentLabel">0% usado</span>
+                            <span class="font-medium text-gray-700 dark:text-gray-300" id="storageFractionLabel">0 / 32768 KB</span>
+                        </div>
+                        <div class="h-3 bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                            <div id="storageProgressBar" class="h-full rounded-full transition-all duration-500 bg-google-blue" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">Uso por site</h3>
+                        <div id="storagePerSiteList" class="space-y-2 max-h-48 overflow-y-auto">
+                            <p class="text-sm text-gray-400 text-center py-4">Nenhum site publicado ainda</p>
+                        </div>
+                    </div>
+                </div>
+
                 <div id="mySitesGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
                 <div id="noMySitesState" class="hidden flex-col items-center justify-center py-20 text-center">
                     <i class="fa-solid fa-folder-open text-5xl text-gray-300 dark:text-gray-600 mb-4"></i>
@@ -362,6 +397,10 @@
                     <button onclick="formatCode()" class="bg-gray-700 hover:bg-gray-600 text-gray-200 px-3 py-1.5 rounded flex items-center space-x-1.5">
                         <i class="fa-solid fa-wand-magic-sparkles text-yellow-400"></i>
                     </button>
+                    <span id="editorStorageBadge" class="hidden sm:inline-flex items-center gap-1.5 text-[11px] text-gray-400 bg-gray-800 px-2.5 py-1 rounded-lg border border-gray-700 font-mono" title="Tamanho do código atual (1 linha = 1 KB)">
+                        <i class="fa-solid fa-hard-drive text-blue-400"></i>
+                        <span id="editorStorageText">0 KB</span>
+                    </span>
                     <button onclick="openPublishModal()" class="bg-google-green hover:bg-emerald-600 text-white font-semibold px-4 py-1.5 rounded shadow flex items-center space-x-1.5">
                         <i class="fa-solid fa-cloud-arrow-up"></i><span>Publicar</span>
                     </button>
@@ -489,6 +528,15 @@
                 </div>
             </div>
             <form onsubmit="confirmPublish(event)" class="p-6 space-y-4">
+                <div id="pubStorageInfo" class="flex items-center justify-between gap-3 p-3 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-800 text-xs">
+                    <div class="flex items-center gap-2 text-gray-700 dark:text-gray-200">
+                        <i class="fa-solid fa-hard-drive text-google-blue"></i>
+                        <span>Este site: <strong id="pubSiteSize">0 KB</strong></span>
+                    </div>
+                    <div class="text-gray-500 dark:text-gray-400">
+                        Livre após: <strong id="pubFreeAfter" class="text-gray-700 dark:text-gray-200">—</strong>
+                    </div>
+                </div>
                 <div>
                     <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Título</label>
                     <input type="text" id="pubTitle" required class="w-full px-3.5 py-2 text-sm bg-gray-50 dark:bg-google-darkBg border border-gray-300 dark:border-google-darkBorder rounded-lg outline-none focus:border-google-blue dark:text-white">
@@ -703,6 +751,8 @@
         const db = getFirestore(app);
 
         window.db = db;
+        window.fsDoc = doc;
+        window.fsGetDoc = getDoc;
         window.firestoreSites = [];
         window.currentUser = null;
         window.userFavorites = [];
@@ -714,14 +764,84 @@
         window.autoSaveTimer = null;
         window.currentCommentsSiteId = null;
         window.analyticsChart = null;
+        window._userUnsub = null; // listener do documento do usuário no Firestore
 
+        const DEFAULT_STORAGE_LIMIT_KB = 32 * 1024; // 32 MB
+
+        // Aplica dados vindos do Firestore no currentUser + localStorage + UI
+        function applyUserDataFromFirestore(userData, username) {
+            if (!userData) return;
+            const limit = (typeof userData.storageLimitKB === 'number' && userData.storageLimitKB > 0)
+                ? userData.storageLimitKB
+                : DEFAULT_STORAGE_LIMIT_KB;
+
+            window.currentUser = {
+                displayName: userData.displayName || username,
+                username: userData.username || username,
+                bio: userData.bio || '',
+                avatar: userData.avatar || '',
+                github: userData.github || '',
+                twitter: userData.twitter || '',
+                website: userData.website || '',
+                storageUsedKB: typeof userData.storageUsedKB === 'number' ? userData.storageUsedKB : 0,
+                storageLimitKB: limit
+            };
+            window.userFavorites = Array.isArray(userData.favorites) ? userData.favorites : (window.userFavorites || []);
+            // Limite efetivo usado pelo sistema de storage (pode ser alterado no Firestore)
+            window.STORAGE_LIMIT_KB = limit;
+
+            localStorage.setItem('weblab_user', JSON.stringify({
+                displayName: window.currentUser.displayName,
+                username: window.currentUser.username,
+                bio: window.currentUser.bio,
+                avatar: window.currentUser.avatar,
+                github: window.currentUser.github,
+                twitter: window.currentUser.twitter,
+                website: window.currentUser.website,
+                storageLimitKB: limit
+            }));
+
+            updateUserUI();
+            if (window.activeTab === 'mysites') renderMySites();
+            else if (typeof window.updateStorageUI === 'function') window.updateStorageUI();
+            if (window.activeTab === 'favorites') renderFavorites();
+            if (window.activeTab === 'search') renderSearchResults();
+        }
+
+        // Escuta em tempo real o documento do usuário logado (mudanças no Console aparecem na hora)
+        function subscribeToCurrentUser(username) {
+            if (window._userUnsub) {
+                try { window._userUnsub(); } catch (e) {}
+                window._userUnsub = null;
+            }
+            if (!username) return;
+            window._userUnsub = onSnapshot(doc(db, "users", username), (snap) => {
+                if (!snap.exists()) return;
+                applyUserDataFromFirestore(snap.data(), username);
+            }, (err) => {
+                console.warn('Erro ao ouvir usuário no Firestore:', err);
+            });
+        }
+
+        function unsubscribeCurrentUser() {
+            if (window._userUnsub) {
+                try { window._userUnsub(); } catch (e) {}
+                window._userUnsub = null;
+            }
+        }
+
+        // Restaura sessão: mostra UI rápido, depois sincroniza com Firestore
         const savedUser = localStorage.getItem('weblab_user');
         if (savedUser) {
             try {
                 window.currentUser = JSON.parse(savedUser);
+                if (window.currentUser.storageLimitKB) {
+                    window.STORAGE_LIMIT_KB = window.currentUser.storageLimitKB;
+                }
                 document.getElementById('authScreen').classList.add('hidden');
                 updateUserUI();
-                loadUserFavorites();
+                // Sincroniza imediatamente + fica ouvindo mudanças do Console
+                subscribeToCurrentUser(window.currentUser.username);
             } catch(e) { localStorage.removeItem('weblab_user'); }
         }
 
@@ -754,19 +874,9 @@
                 if (!userSnap.exists()) { showToast("Usuário não encontrado!", "error"); return; }
                 const userData = userSnap.data();
                 if (userData.password !== password) { showToast("Senha incorreta!", "error"); return; }
-                window.currentUser = { 
-                    displayName: userData.displayName, 
-                    username: userData.username,
-                    bio: userData.bio || '',
-                    avatar: userData.avatar || '',
-                    github: userData.github || '',
-                    twitter: userData.twitter || '',
-                    website: userData.website || ''
-                };
-                localStorage.setItem('weblab_user', JSON.stringify(window.currentUser));
+                applyUserDataFromFirestore(userData, username);
                 document.getElementById('authScreen').classList.add('hidden');
-                updateUserUI();
-                loadUserFavorites();
+                subscribeToCurrentUser(username);
                 showToast("Login realizado!", "success");
             } catch(err) { showToast("Erro: " + err.message, "error"); }
             finally { btn.disabled = false; btn.innerHTML = `<span>Entrar na Conta</span>`; }
@@ -783,7 +893,7 @@
             try {
                 const userSnap = await getDoc(doc(db, "users", username));
                 if (userSnap.exists()) { showToast("Nome de usuário já existe!", "error"); return; }
-                await setDoc(doc(db, "users", username), {
+                const newUser = {
                     displayName, username, password,
                     createdAt: new Date().toISOString(),
                     mySites: [],
@@ -792,12 +902,14 @@
                     avatar: '',
                     github: '',
                     twitter: '',
-                    website: ''
-                });
-                window.currentUser = { displayName, username, bio: '', avatar: '', github: '', twitter: '', website: '' };
-                localStorage.setItem('weblab_user', JSON.stringify(window.currentUser));
+                    website: '',
+                    storageUsedKB: 0,
+                    storageLimitKB: DEFAULT_STORAGE_LIMIT_KB
+                };
+                await setDoc(doc(db, "users", username), newUser);
+                applyUserDataFromFirestore(newUser, username);
                 document.getElementById('authScreen').classList.add('hidden');
-                updateUserUI();
+                subscribeToCurrentUser(username);
                 showToast("Conta criada!", "success");
             } catch(err) { showToast("Erro: " + err.message, "error"); }
             finally { btn.disabled = false; btn.innerHTML = `<span>Criar Conta</span>`; }
@@ -805,9 +917,11 @@
 
         window.handleLogout = function() {
             if (confirm("Deseja sair da conta?")) {
+                unsubscribeCurrentUser();
                 localStorage.removeItem('weblab_user');
                 window.currentUser = null;
                 window.userFavorites = [];
+                window.STORAGE_LIMIT_KB = DEFAULT_STORAGE_LIMIT_KB;
                 document.getElementById('authScreen').classList.remove('hidden');
                 showToast("Você saiu.", "success");
             }
@@ -823,7 +937,8 @@
             } else {
                 avatarEl.innerText = window.currentUser.displayName.charAt(0);
             }
-            document.getElementById('pubAuthor').value = `${window.currentUser.displayName} (@${window.currentUser.username})`;
+            const pubAuthor = document.getElementById('pubAuthor');
+            if (pubAuthor) pubAuthor.value = `${window.currentUser.displayName} (@${window.currentUser.username})`;
         }
 
         async function loadUserFavorites() {
@@ -832,6 +947,7 @@
                 const userSnap = await getDoc(doc(db, "users", window.currentUser.username));
                 if (userSnap.exists()) {
                     window.userFavorites = userSnap.data().favorites || [];
+                    applyUserDataFromFirestore(userSnap.data(), window.currentUser.username);
                 }
             } catch(e) {}
         }
@@ -867,6 +983,99 @@
             if (window.activeTab === 'favorites') renderFavorites();
         });
 
+        // ========== STORAGE SYSTEM ==========
+        // 1 linha de código = 1 KB | Limite padrão: 32 MB (pode ser alterado no Firestore em users/{username}.storageLimitKB)
+        if (typeof window.STORAGE_LIMIT_KB !== 'number') {
+            window.STORAGE_LIMIT_KB = DEFAULT_STORAGE_LIMIT_KB;
+        }
+
+        window.countCodeLines = function(code) {
+            if (!code || typeof code !== 'string') return 0;
+            // Conta linhas (incluindo linhas vazias). 1 linha = 1 KB
+            return code.split(/\r?\n/).length;
+        };
+
+        window.getSiteSizeKB = function(html, css, js) {
+            return window.countCodeLines(html) + window.countCodeLines(css) + window.countCodeLines(js);
+        };
+
+        window.getEffectiveStorageLimit = function() {
+            if (window.currentUser && typeof window.currentUser.storageLimitKB === 'number' && window.currentUser.storageLimitKB > 0) {
+                return window.currentUser.storageLimitKB;
+            }
+            return (typeof window.STORAGE_LIMIT_KB === 'number' && window.STORAGE_LIMIT_KB > 0)
+                ? window.STORAGE_LIMIT_KB
+                : DEFAULT_STORAGE_LIMIT_KB;
+        };
+
+        window.getUserStorageInfo = function() {
+            const limit = window.getEffectiveStorageLimit();
+            if (!window.currentUser) return { used: 0, limit: limit, sites: [] };
+            const mySites = (window.firestoreSites || []).filter(s => s.ownerUsername === window.currentUser.username);
+            const sites = mySites.map(s => {
+                // Preferir valor salvo no Firestore; se não existir, calcular na hora
+                const size = typeof s.sizeKB === 'number' ? s.sizeKB : window.getSiteSizeKB(s.html, s.css, s.js);
+                return { id: s.id, title: s.title || 'Sem título', sizeKB: size, slug: s.slug };
+            }).sort((a, b) => b.sizeKB - a.sizeKB);
+            const used = sites.reduce((sum, s) => sum + s.sizeKB, 0);
+            return { used, limit, sites };
+        };
+
+        window.formatStorage = function(kb) {
+            if (kb >= 1024) {
+                const mb = kb / 1024;
+                return mb >= 10 ? mb.toFixed(1) + ' MB' : mb.toFixed(2) + ' MB';
+            }
+            return kb.toLocaleString('pt-BR') + ' KB';
+        };
+
+        window.updateStorageUI = function() {
+            const info = window.getUserStorageInfo();
+            const pct = Math.min(100, (info.used / info.limit) * 100);
+            const remaining = Math.max(0, info.limit - info.used);
+
+            const usedLabel = document.getElementById('storageUsedLabel');
+            const remainingLabel = document.getElementById('storageRemainingLabel');
+            const percentLabel = document.getElementById('storagePercentLabel');
+            const fractionLabel = document.getElementById('storageFractionLabel');
+            const bar = document.getElementById('storageProgressBar');
+            const list = document.getElementById('storagePerSiteList');
+
+            if (usedLabel) usedLabel.textContent = window.formatStorage(info.used);
+            if (remainingLabel) remainingLabel.textContent = `de ${window.formatStorage(info.limit)} · ${window.formatStorage(remaining)} livres`;
+            if (percentLabel) percentLabel.textContent = `${pct.toFixed(1)}% usado`;
+            if (fractionLabel) fractionLabel.textContent = `${info.used.toLocaleString('pt-BR')} / ${info.limit.toLocaleString('pt-BR')} KB`;
+            
+            if (bar) {
+                bar.style.width = pct + '%';
+                bar.className = 'h-full rounded-full transition-all duration-500 ' + (
+                    pct >= 90 ? 'bg-red-500' : pct >= 70 ? 'bg-amber-500' : 'bg-google-blue'
+                );
+            }
+
+            if (list) {
+                if (info.sites.length === 0) {
+                    list.innerHTML = '<p class="text-sm text-gray-400 text-center py-4">Nenhum site publicado ainda</p>';
+                } else {
+                    list.innerHTML = info.sites.map(s => {
+                        const sitePct = info.used > 0 ? (s.sizeKB / info.used * 100) : 0;
+                        return `
+                        <div class="flex items-center gap-3 p-2.5 rounded-xl bg-gray-50 dark:bg-google-darkBg border border-gray-100 dark:border-google-darkBorder">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center justify-between gap-2">
+                                    <span class="text-sm font-medium text-gray-800 dark:text-white truncate">${(window.escapeHtml||((t)=>t))(s.title)}</span>
+                                    <span class="text-xs font-mono text-gray-500 whitespace-nowrap">${window.formatStorage(s.sizeKB)}</span>
+                                </div>
+                                <div class="mt-1.5 h-1.5 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                                    <div class="h-full bg-google-blue/70 rounded-full" style="width:${sitePct}%"></div>
+                                </div>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            }
+        };
+
         window.confirmPublish = async function(e) {
             e.preventDefault();
             if (!window.currentUser) { showToast("Faça login para publicar!", "error"); return; }
@@ -876,6 +1085,21 @@
                 const docId = window.currentEditingSiteId || ('site-' + Date.now());
                 const existing = window.currentEditingSiteId ? window.firestoreSites.find(s => s.id === window.currentEditingSiteId) : null;
                 
+                const htmlVal = document.getElementById('codeHTML').value;
+                const cssVal = document.getElementById('codeCSS').value;
+                const jsVal = document.getElementById('codeJS').value;
+                const newSizeKB = window.getSiteSizeKB(htmlVal, cssVal, jsVal);
+
+                // Verifica limite de armazenamento
+                const info = window.getUserStorageInfo();
+                const oldSize = existing ? (typeof existing.sizeKB === 'number' ? existing.sizeKB : window.getSiteSizeKB(existing.html, existing.css, existing.js)) : 0;
+                const projected = info.used - oldSize + newSizeKB;
+                const limitNow = window.getEffectiveStorageLimit();
+                if (projected > limitNow) {
+                    showToast(`Armazenamento insuficiente! Você tem ${window.formatStorage(info.limit - info.used + oldSize)} livres, mas este site usa ${window.formatStorage(newSizeKB)}.`, "error");
+                    return;
+                }
+
                 let versions = existing?.versions || [];
                 if (existing) {
                     versions = [{
@@ -883,14 +1107,15 @@
                         css: existing.css,
                         js: existing.js,
                         savedAt: existing.updatedAt || new Date().toISOString(),
-                        title: existing.title
+                        title: existing.title,
+                        sizeKB: oldSize
                     }, ...versions].slice(0, 8);
                 }
 
                 const tagsRaw = document.getElementById('pubTags').value || '';
                 const tags = tagsRaw.split(',').map(t => t.trim().toLowerCase()).filter(t => t.length > 0);
 
-                const thumbnail = document.getElementById('codeHTML').value.substring(0, 300);
+                const thumbnail = htmlVal.substring(0, 300);
 
                 const siteData = {
                     title: document.getElementById('pubTitle').value,
@@ -906,28 +1131,38 @@
                     viewHistory: existing?.viewHistory || [],
                     updatedAt: new Date().toISOString().split('T')[0],
                     createdAt: existing?.createdAt || new Date().toISOString(),
-                    html: document.getElementById('codeHTML').value,
-                    css: document.getElementById('codeCSS').value,
-                    js: document.getElementById('codeJS').value,
+                    html: htmlVal,
+                    css: cssVal,
+                    js: jsVal,
                     lockCode: document.getElementById('pubLockCode').checked,
                     lockEdit: document.getElementById('pubLockEdit').checked,
                     lockExternal: document.getElementById('pubLockExternal').checked,
                     lockConsole: document.getElementById('pubLockConsole').checked,
                     versions: versions,
-                    thumbnail: thumbnail
+                    thumbnail: thumbnail,
+                    sizeKB: newSizeKB  // Armazenado no Firestore
                 };
 
                 await setDoc(doc(db, "sites", docId), siteData, { merge: true });
+
+                // Atualiza total de armazenamento no usuário (NÃO sobrescreve storageLimitKB — você controla no Console)
+                const newInfo = window.getUserStorageInfo();
+                const adjustedUsed = newInfo.used - oldSize + newSizeKB;
                 await updateDoc(doc(db, "users", window.currentUser.username), {
-                    mySites: arrayUnion({ id: docId, title: siteData.title, slug: siteData.slug })
+                    mySites: arrayUnion({ id: docId, title: siteData.title, slug: siteData.slug }),
+                    storageUsedKB: adjustedUsed
                 }).catch(async () => {
-                    await setDoc(doc(db, "users", window.currentUser.username), { mySites: [{ id: docId, title: siteData.title, slug: siteData.slug }] }, { merge: true });
+                    await setDoc(doc(db, "users", window.currentUser.username), { 
+                        mySites: [{ id: docId, title: siteData.title, slug: siteData.slug }],
+                        storageUsedKB: adjustedUsed
+                    }, { merge: true });
                 });
 
                 localStorage.removeItem('weblab_draft');
                 closePublishModal();
                 openInBrowser(docId);
-                showToast("Site publicado com sucesso!", "success");
+                showToast(`Site publicado! (${window.formatStorage(newSizeKB)})`, "success");
+                if (window.activeTab === 'mysites') renderMySites();
             } catch (err) {
                 showToast("Erro ao publicar: " + err.message, "error");
             } finally {
@@ -944,8 +1179,15 @@
             }
             if (!confirm(`Excluir permanentemente "${title}"?`)) return;
             try {
+                const freed = typeof site.sizeKB === 'number' ? site.sizeKB : window.getSiteSizeKB(site.html, site.css, site.js);
                 await deleteDoc(doc(db, "sites", siteId));
-                showToast("Site excluído!", "success");
+                // Atualiza storageUsed no usuário
+                const info = window.getUserStorageInfo();
+                const newUsed = Math.max(0, info.used - freed);
+                await updateDoc(doc(db, "users", window.currentUser.username), {
+                    storageUsedKB: newUsed
+                }).catch(() => {});
+                showToast(`Site excluído! Liberou ${window.formatStorage(freed)}`, "success");
                 if (window.activeTab === 'mysites') renderMySites();
             } catch(e) { showToast("Erro: " + e.message, "error"); }
         };
@@ -1330,6 +1572,32 @@ document.body.style.background = randomColor();` }
             const el = document.getElementById(`code${window.activeCodeTab.toUpperCase()}`);
             const c = document.getElementById('charCounter');
             if (el && c) c.textContent = `${el.value.length.toLocaleString()} caracteres`;
+
+            // Atualiza badge de armazenamento do editor
+            const badgeText = document.getElementById('editorStorageText');
+            if (badgeText) {
+                const size = getSiteSizeKB(
+                    document.getElementById('codeHTML').value,
+                    document.getElementById('codeCSS').value,
+                    document.getElementById('codeJS').value
+                );
+                const info = getUserStorageInfo();
+                const existing = window.currentEditingSiteId 
+                    ? window.firestoreSites.find(s => s.id === window.currentEditingSiteId) 
+                    : null;
+                const oldSize = existing 
+                    ? (typeof existing.sizeKB === 'number' ? existing.sizeKB : getSiteSizeKB(existing.html, existing.css, existing.js)) 
+                    : 0;
+                const projected = info.used - oldSize + size;
+                const limitNow = (typeof window.getEffectiveStorageLimit === 'function') ? window.getEffectiveStorageLimit() : (window.STORAGE_LIMIT_KB || 32768);
+                const freeAfter = Math.max(0, limitNow - projected);
+                badgeText.textContent = `${formatStorage(size)} · ${formatStorage(freeAfter)} livres`;
+                const parent = badgeText.parentElement;
+                if (parent) {
+                    parent.classList.toggle('text-red-400', projected > limitNow);
+                    parent.classList.toggle('border-red-500/50', projected > limitNow);
+                }
+            }
         }
 
         function triggerImageUpload() {
@@ -1426,14 +1694,32 @@ document.body.style.background = randomColor();` }
             const sites = window.firestoreSites.filter(s => s.ownerUsername === username && (!s.isPrivate || (window.currentUser && window.currentUser.username === username)));
             
             let profileData = { displayName: username, bio: '', avatar: '', github: '', twitter: '', website: '' };
-            try {
-                const userSnap = await window.db ? await (await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')).getDoc((await import('https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js')).doc(window.db, "users", username)) : null;
-            } catch(e) {}
             
-            if (window.currentUser && window.currentUser.username === username) {
+            // Sempre tenta ler o perfil atualizado do Firestore
+            try {
+                if (window.db && window.fsGetDoc && window.fsDoc) {
+                    const userSnap = await window.fsGetDoc(window.fsDoc(window.db, "users", username));
+                    if (userSnap.exists()) {
+                        const d = userSnap.data();
+                        profileData = {
+                            displayName: d.displayName || username,
+                            bio: d.bio || '',
+                            avatar: d.avatar || '',
+                            github: d.github || '',
+                            twitter: d.twitter || '',
+                            website: d.website || ''
+                        };
+                    }
+                }
+            } catch(e) {
+                console.warn('Erro ao carregar perfil:', e);
+            }
+            
+            // Fallback: se for o usuário logado, usa currentUser
+            if ((!profileData.displayName || profileData.displayName === username) && window.currentUser && window.currentUser.username === username) {
                 profileData = { ...window.currentUser };
-            } else if (sites[0]) {
-                profileData.displayName = sites[0].author.split(' (@')[0];
+            } else if ((!profileData.displayName || profileData.displayName === username) && sites[0]) {
+                profileData.displayName = (sites[0].author || '').split(' (@')[0] || username;
             }
             
             document.getElementById('profileAvatar').innerHTML = profileData.avatar 
@@ -1614,6 +1900,7 @@ document.body.style.background = randomColor();` }
         }
 
         function renderMySites() {
+            updateStorageUI();
             if (!window.currentUser) {
                 document.getElementById('mySitesGrid').innerHTML = '';
                 document.getElementById('noMySitesState').classList.remove('hidden');
@@ -1622,19 +1909,29 @@ document.body.style.background = randomColor();` }
             const my = getSavedSites().filter(s => s.ownerUsername === window.currentUser.username);
             const grid = document.getElementById('mySitesGrid');
             const empty = document.getElementById('noMySitesState');
-            if (my.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
+            if (my.length === 0) { 
+                grid.innerHTML = ''; 
+                empty.classList.remove('hidden'); 
+                return; 
+            }
             empty.classList.add('hidden');
-            grid.innerHTML = my.map(site => `
+            grid.innerHTML = my.map(site => {
+                const sizeKB = typeof site.sizeKB === 'number' ? site.sizeKB : getSiteSizeKB(site.html, site.css, site.js);
+                return `
                 <div class="bg-white dark:bg-google-darkCard rounded-xl border border-gray-200 dark:border-google-darkBorder overflow-hidden shadow-sm hover:shadow-md flex flex-col">
                     <div class="h-32 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
                         <iframe srcdoc="${escapeHtml(fullCompiledHTML(site.html, site.css, site.js))}" class="w-[200%] h-[200%] scale-50 origin-top-left pointer-events-none border-0"></iframe>
                         ${site.isPrivate ? '<span class="absolute top-2 left-2 bg-purple-600 text-white text-[10px] px-2 py-0.5 rounded-full">Privado</span>' : ''}
+                        <span class="absolute bottom-2 left-2 bg-black/60 text-white text-[10px] px-2 py-0.5 rounded-full font-mono">
+                            <i class="fa-solid fa-hard-drive text-[9px]"></i> ${formatStorage(sizeKB)}
+                        </span>
                     </div>
                     <div class="p-4 flex-1 flex flex-col">
                         <h3 class="font-bold text-gray-800 dark:text-white text-sm line-clamp-1">${escapeHtml(site.title)}</h3>
                         <p class="text-xs text-gray-500 mt-1 line-clamp-2 flex-1">${escapeHtml(site.description)}</p>
                         <div class="flex items-center justify-between text-xs text-gray-400 mt-3 pt-3 border-t border-gray-100 dark:border-google-darkBorder">
                             <span><i class="fa-regular fa-eye"></i> ${site.views||0} · <i class="fa-regular fa-heart"></i> ${site.likes||0}</span>
+                            <span class="font-mono text-[10px]"><i class="fa-solid fa-hard-drive"></i> ${formatStorage(sizeKB)}</span>
                         </div>
                         <div class="grid grid-cols-4 gap-2 mt-3">
                             <button onclick="openInBrowser('${site.id}')" class="py-1.5 bg-google-blue text-white rounded-lg text-xs" title="Abrir"><i class="fa-solid fa-eye"></i></button>
@@ -1643,8 +1940,8 @@ document.body.style.background = randomColor();` }
                             <button onclick="deleteSite('${site.id}', '${escapeHtml(site.title)}')" class="py-1.5 bg-red-50 dark:bg-red-900/20 text-red-600 rounded-lg text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
         function siteCardHTML(site, isFavoriteView = false) {
@@ -1883,6 +2180,34 @@ document.body.style.background = randomColor();` }
             document.getElementById('pubLockEdit').checked = false;
             document.getElementById('pubLockExternal').checked = false;
             document.getElementById('pubLockConsole').checked = false;
+
+            // Preenche info de armazenamento
+            const size = getSiteSizeKB(
+                document.getElementById('codeHTML').value,
+                document.getElementById('codeCSS').value,
+                document.getElementById('codeJS').value
+            );
+            const info = getUserStorageInfo();
+            const existing = window.currentEditingSiteId 
+                ? window.firestoreSites.find(s => s.id === window.currentEditingSiteId) 
+                : null;
+            const oldSize = existing 
+                ? (typeof existing.sizeKB === 'number' ? existing.sizeKB : getSiteSizeKB(existing.html, existing.css, existing.js)) 
+                : 0;
+            const projected = info.used - oldSize + size;
+            const limitNow = (typeof window.getEffectiveStorageLimit === 'function') ? window.getEffectiveStorageLimit() : (window.STORAGE_LIMIT_KB || 32768);
+            const freeAfter = Math.max(0, limitNow - projected);
+
+            document.getElementById('pubSiteSize').textContent = formatStorage(size);
+            document.getElementById('pubFreeAfter').textContent = formatStorage(freeAfter);
+            const infoBox = document.getElementById('pubStorageInfo');
+            if (infoBox) {
+                infoBox.classList.toggle('bg-red-50', projected > limitNow);
+                infoBox.classList.toggle('dark:bg-red-900/20', projected > limitNow);
+                infoBox.classList.toggle('border-red-200', projected > limitNow);
+                infoBox.classList.toggle('dark:border-red-800', projected > limitNow);
+            }
+
             document.getElementById('publishModal').classList.remove('hidden');
         }
 
